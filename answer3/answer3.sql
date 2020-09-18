@@ -1,7 +1,7 @@
 SELECT usr_no												AS '사용자번호',
-	IF(gender_code IS NULL,	'-', 
+	IF(gender_code IS NULL,	'-',
 		IF(gender_code % 2 = 1, '남', '여'))	AS '성별',
-	IF(birth_day IS NULL,	'-', 
+	IF(birth_day IS NULL,	'-',
 		Floor(((200626 - birth_day)
 		+ (IF(gender_code > 2, 0, 1) * 1000000)) / 10000)) 	AS '나이',
 	IF(loc_nm IS NULL,		'-', loc_nm)					AS '지역명',
