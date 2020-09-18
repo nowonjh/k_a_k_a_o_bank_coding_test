@@ -1,0 +1,109 @@
+{
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "527.99"
+    },
+    "ordering_operation": {
+      "using_filesort": true,
+      "windowing": {
+        "windows": [
+          {
+            "name": "<unnamed window>",
+            "using_temporary_table": true,
+            "using_filesort": true,
+            "filesort_key": [
+              "`menu_nm`"
+            ],
+            "frame_buffer": {
+              "using_temporary_table": true,
+              "optimized_frame_evaluation": true
+            },
+            "functions": [
+              "sum"
+            ]
+          }
+        ],
+        "cost_info": {
+          "sort_cost": "467.10"
+        },
+        "grouping_operation": {
+          "using_temporary_table": true,
+          "using_filesort": false,
+          "table": {
+            "table_name": "t1",
+            "access_type": "ALL",
+            "rows_examined_per_scan": 519,
+            "rows_produced_per_join": 467,
+            "filtered": "90.00",
+            "cost_info": {
+              "read_cost": "14.18",
+              "eval_cost": "46.71",
+              "prefix_cost": "60.89",
+              "data_read_per_join": "226K"
+            },
+            "used_columns": [
+              "log_id",
+              "menu_nm",
+              "lag_menu_nm"
+            ],
+            "attached_condition": "(`t1`.`lag_menu_nm` is not null)",
+            "materialized_from_subquery": {
+              "using_temporary_table": true,
+              "dependent": false,
+              "cacheable": true,
+              "query_block": {
+                "select_id": 2,
+                "cost_info": {
+                  "query_cost": "585.35"
+                },
+                "windowing": {
+                  "windows": [
+                    {
+                      "name": "<unnamed window>",
+                      "using_filesort": true,
+                      "filesort_key": [
+                        "`USR_NO`",
+                        "`LOG_ID`"
+                      ],
+                      "frame_buffer": {
+                        "using_temporary_table": true,
+                        "optimized_frame_evaluation": true
+                      },
+                      "functions": [
+                        "lag"
+                      ]
+                    }
+                  ],
+                  "cost_info": {
+                    "sort_cost": "519.20"
+                  },
+                  "table": {
+                    "table_name": "MENU_LOG",
+                    "access_type": "ALL",
+                    "rows_examined_per_scan": 649,
+                    "rows_produced_per_join": 519,
+                    "filtered": "80.00",
+                    "cost_info": {
+                      "read_cost": "14.23",
+                      "eval_cost": "51.92",
+                      "prefix_cost": "66.15",
+                      "data_read_per_join": "194K"
+                    },
+                    "used_columns": [
+                      "LOG_TKTM",
+                      "LOG_ID",
+                      "USR_NO",
+                      "MENU_NM"
+                    ],
+                    "attached_condition": "(`kakaobank`.`menu_log`.`MENU_NM` not in ('login','logout'))"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
