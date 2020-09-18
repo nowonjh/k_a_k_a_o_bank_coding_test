@@ -1,0 +1,19 @@
+[
+	{
+		"menu_log_ETL_Job": {
+			"delay_min": 20,
+			"concurrency": 3,
+			"schedule": 86400,
+			"source_table": {
+				"table_name": "menu_log",
+				"time_field": "",
+				"time_format:": "yyyyMMddHHmmss"
+			},
+			"target_table": {
+				"type": "hdfs",
+				"format": "parquet",
+				"path": "/data/menu_log/yyyyMMdd/HH.parquet"
+			}
+		}
+	}
+]
