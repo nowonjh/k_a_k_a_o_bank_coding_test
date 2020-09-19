@@ -2,15 +2,14 @@ package com.kakao.codingtest.task;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.codingtest.config.vo.TaskInfoVO;
 
@@ -19,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author yuganji
- *
+ * 1분에 한번씩 테스크 설정파일을 읽어 캐싱한다.
  */
 @Slf4j
 @Service
@@ -27,7 +26,7 @@ public class TaskInfoManager {
 	private ObjectMapper objMapper = new ObjectMapper();
 
 	@Getter
-	private List<Map<String, TaskInfoVO>> taskList = null;
+	private List<TaskInfoVO> taskList = null;
 
 	@PostConstruct
 	public void init() {
@@ -37,7 +36,7 @@ public class TaskInfoManager {
 	public void reload() {
 		try {
 			this.taskList = objMapper.readValue(new File("./conf/task_info.json"),
-					new ArrayList<Map<String, TaskInfoVO>>().getClass().asSubclass(List.class));
+					new TypeReference<List<TaskInfoVO>>(){});
 		} catch (IOException e) {
 			if (this.taskList == null) {
 				log.error(e.getMessage(), e);

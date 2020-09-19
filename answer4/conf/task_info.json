@@ -3,7 +3,6 @@
 		"name" : "menu_log_ETL_Job",
 		"delay_min": 20,
 		"hour_of_day": 3,
-		"period": 86400,
 		"concurrency": 3,
 		"delete": true,
 		"use_sqoop": false,
@@ -15,12 +14,13 @@
 			"password": "wogurdl13",
 			"table_name": "menu_log",
 			"time_field": "",
-			"time_format:": "yyyyMMddHHmmss"
+			"time_format": "yyyyMMddHHmmss"
 		},
 		"target": {
 			"type": "hdfs",
+			"url": "hdfs://localhost:8020",
 			"format": "parquet",
-			"path": "/data/menu_log/yyyyMMdd/HH.parquet"
+			"path": "/data/menu_log/yyyyMMdd/HH"
 		}
 	}
 	

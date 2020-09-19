@@ -1,5 +1,8 @@
 package com.kakao.codingtest.config.vo;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import lombok.Data;
 
 /**
@@ -7,6 +10,7 @@ import lombok.Data;
  *
  */
 @Data
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class SourceVO {
 	private String type;
 	private String url;
@@ -14,6 +18,6 @@ public class SourceVO {
 	private String username;
 	private String password;
 	private String tableName;
-	private String timefield;
+	private String timeField;
 	private String timeFormat;
 }
