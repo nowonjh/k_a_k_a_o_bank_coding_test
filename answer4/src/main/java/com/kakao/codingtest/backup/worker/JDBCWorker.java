@@ -6,9 +6,6 @@ import java.util.concurrent.Executors;
 import com.kakao.codingtest.config.vo.TaskInfoVO;
 import com.kakao.codingtest.jdbc.DatabaseManager;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class JDBCWorker extends AWorker {
 	private DatabaseManager dbManager;
 

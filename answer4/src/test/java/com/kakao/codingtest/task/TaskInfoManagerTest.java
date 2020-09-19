@@ -16,9 +16,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.google.gson.Gson;
 import com.kakao.codingtest.config.vo.TaskInfoVO;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @SpringBootTest
 public class TaskInfoManagerTest {
 
