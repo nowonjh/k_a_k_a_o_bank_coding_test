@@ -13,14 +13,14 @@
 			"username": "root",
 			"password": "wogurdl13",
 			"table_name": "menu_log",
-			"time_field": "",
+			"time_field": "log_tktm",
 			"time_format": "yyyyMMddHHmmss"
 		},
 		"target": {
 			"type": "hdfs",
 			"url": "hdfs://localhost:8020",
 			"format": "parquet",
-			"path": "/data/menu_log/yyyyMMdd/HH"
+			"path": "/data/menu_log"
 		}
 	}
 	
