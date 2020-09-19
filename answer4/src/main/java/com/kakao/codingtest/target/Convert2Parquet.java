@@ -1,7 +1,11 @@
-package com.kakao.codingtest.parquet;
+package com.kakao.codingtest.target;
 
-import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,8 +14,9 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.GenericRecordBuilder;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -22,61 +27,62 @@ import org.apache.parquet.hadoop.ParquetFileWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
+import com.kakao.codingtest.config.vo.TaskInfoVO;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ConvertParquetUtil {
-	private static final String TMP_EXT = ".tmp";
+public class Convert2Parquet implements IConverData {
+	private TaskInfoVO taskInfoVO;
+	
+	public Convert2Parquet(TaskInfoVO taskInfoVO) {
+		this.taskInfoVO = taskInfoVO;
+	}
 
-	public static String mapToParquet(
-			FileSystem fileSystem, String parquetPath, List<Map<String, Object>> dataList)
-					throws IOException {
-		Path outputParquetFile;
-		String tmpPath;
-		if (StringUtils.isBlank(parquetPath)) {
+	@Override
+	public List<Path> convertAndPushHDFS(FileSystem fileSystem, List<Map<String, Object>> dataList) throws IOException {
+		if (StringUtils.isBlank(this.taskInfoVO.getTarget().getPath())) {
 			throw new IllegalArgumentException("parquetPath cannot be null or empty");
-		} else {
-			tmpPath = parquetPath + TMP_EXT;
-			outputParquetFile = new Path(tmpPath);
 		}
 		if (dataList.size() == 0) {
 			log.warn("Data is empty");
 			return null;
 		}
-		FieldAssembler<Schema> fa = SchemaBuilder
-				.record("record_name")
-				.namespace("com.kakao.codingtest")
-				.fields();
-		for (Entry<String, Object> entry: dataList.get(0).entrySet()) {
-			fa.name(entry.getKey()).type().stringType().stringDefault("-");
-		}
-		Schema schema = fa.endRecord();
-		Configuration conf;
-		if (fileSystem == null) {
-			conf = new Configuration();
-		} else {
-			conf = fileSystem.getConf();
-		}
-		conf.set("parquet.strings.signed-min-max.enabled", "true");
-		conf.set("parquet.string.min-max-statistics", "true");
-
-		ParquetWriter<GenericData.Record> writer;
-		writer = AvroParquetWriter
-				.<GenericData.Record>builder(outputParquetFile)
-				.withConf(conf)
-				.withDataModel(GenericData.get())
-				.withSchema(schema)
-				.withWriterVersion(ParquetProperties.WriterVersion.PARQUET_1_0)
-				.withRowGroupSize(ParquetWriter.DEFAULT_BLOCK_SIZE)
-				.withPageSize(ParquetProperties.DEFAULT_PAGE_SIZE)
-				.withDictionaryPageSize(ParquetProperties.DEFAULT_DICTIONARY_PAGE_SIZE)
-				.withCompressionCodec(CompressionCodecName.SNAPPY)
-				.withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
-				.withDictionaryEncoding(false)
-				.withValidation(false)
-				.build();
-
+		
+		SimpleDateFormat inFormat = new SimpleDateFormat(taskInfoVO.getSource().getTimeFormat());
+		SimpleDateFormat outDayFormat = new SimpleDateFormat("yyyyMMddHHmm");
+		SimpleDateFormat outTimeFormat = new SimpleDateFormat("HHmm");
+		String timeField = taskInfoVO.getSource().getTimeField();
+		Map<String, ParquetWriter<GenericData.Record>> writerMap = new HashMap<>();
+		Schema schema = null;
 		for (Map<String, Object> row: dataList) {
+			if (schema == null) {
+				FieldAssembler<Schema> fa = SchemaBuilder
+						.record("record_name")
+						.namespace("com.kakao.codingtest")
+						.fields();
+				for (Entry<String, Object> entry: row.entrySet()) {
+					fa.name(entry.getKey()).type().stringType().stringDefault("-");
+				}
+				schema = fa.endRecord();
+			}
+			long date;
+			try {
+				date = inFormat.parse(row.get(timeField).toString()).getTime() / (1000 * 60 * 10) * (1000 * 60 * 10);
+			} catch (ParseException e1) {
+				log.warn("Cannot found timeField");
+				date = new Date().getTime();
+			}
+			String dir = String.join("/", 
+					taskInfoVO.getTarget().getPath(), 
+					outDayFormat.format(date),
+					outTimeFormat.format(date));
+
+			if (writerMap.get(dir) == null) {
+				ParquetWriter<GenericData.Record> writer = this.createParquetWriter(dir, schema);
+				writerMap.put(dir, writer);
+			}
+			ParquetWriter<GenericData.Record> writer = writerMap.get(dir);
 			GenericRecordBuilder record = new GenericRecordBuilder(schema);
 			for (Schema.Field f : schema.getFields()) {
 				switch (f.schema().getType()) {
@@ -126,15 +132,43 @@ public class ConvertParquetUtil {
 			}
 			writer.write(record.build());
 		}
-		if (writer != null) {
-			writer.close();
+		List<Path> destPaths = new ArrayList<>();
+		for (Entry<String, ParquetWriter<Record>> entry: writerMap.entrySet()){
+			if (entry.getValue() != null) {
+				entry.getValue().close();
+			}
+			String destFile = entry.getKey() + "_" + RandomStringUtils.random(5, true, false) + ".parquet";
+			fileSystem.rename(new Path(entry.getKey()), new Path(destFile));
+			destPaths.add(new Path(destFile));
 		}
+		return destPaths;
+	}
 
-		if (fileSystem != null) {
-			fileSystem.rename(outputParquetFile, new Path(parquetPath));
-		} else {
-			FileUtils.moveFile(new File(tmpPath), new File(parquetPath));
-		}
-		return parquetPath;
+	private ParquetWriter<GenericData.Record> createParquetWriter(String dir, Schema schema) 
+			throws IllegalArgumentException, IOException {
+		Configuration conf = new Configuration();
+		conf.set("parquet.strings.signed-min-max.enabled", "true");
+		conf.set("parquet.string.min-max-statistics", "true");
+
+		return AvroParquetWriter
+				.<GenericData.Record>builder(new Path(dir))
+				.withConf(conf)
+				.withDataModel(GenericData.get())
+				.withSchema(schema)
+				.withWriterVersion(ParquetProperties.WriterVersion.PARQUET_1_0)
+				.withRowGroupSize(ParquetWriter.DEFAULT_BLOCK_SIZE)
+				.withPageSize(ParquetProperties.DEFAULT_PAGE_SIZE)
+				.withDictionaryPageSize(ParquetProperties.DEFAULT_DICTIONARY_PAGE_SIZE)
+				.withCompressionCodec(CompressionCodecName.SNAPPY)
+				.withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
+				.withDictionaryEncoding(false)
+				.withValidation(false)
+				.build();
+	}
+
+	@Override
+	public List<Path> convertWriteLocal(List<Map<String, Object>> dataList) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
