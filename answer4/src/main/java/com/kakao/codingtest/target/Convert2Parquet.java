@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +31,23 @@ import com.kakao.codingtest.config.vo.TaskInfoVO;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Convert2Parquet implements IConverData {
+public class Convert2Parquet implements IConvertData {
+	private final SimpleDateFormat outDayFormat = new SimpleDateFormat("yyyyMMdd");
+	private final SimpleDateFormat outTimeFormat = new SimpleDateFormat("HHmm");
 	private TaskInfoVO taskInfoVO;
-	
 	public Convert2Parquet(TaskInfoVO taskInfoVO) {
 		this.taskInfoVO = taskInfoVO;
 	}
 
+	/**
+	 *	데이터 셋을 변환 후 HDFS에 write
+	 *	Task Info에 정의된 Time field에 따라
+	 *  10분단위로 파일을 쪼개어 저장한다
+	 *  ex) ${target.path}/20200916/2030_xxxxx.parquet
+	 *  	${target.path}/20200916/2040_xxxxx.parquet
+	 *  	${target.path}/20200916/2050_xxxxx.parquet
+	 *  	${target.path}/20200916/2060_xxxxx.parquet
+	 */
 	@Override
 	public List<Path> convertAndPushHDFS(FileSystem fileSystem, List<Map<String, Object>> dataList) throws IOException {
 		if (StringUtils.isBlank(this.taskInfoVO.getTarget().getPath())) {
@@ -48,13 +57,13 @@ public class Convert2Parquet implements IConverData {
 			log.warn("Data is empty");
 			return null;
 		}
-		
+
 		SimpleDateFormat inFormat = new SimpleDateFormat(taskInfoVO.getSource().getTimeFormat());
-		SimpleDateFormat outDayFormat = new SimpleDateFormat("yyyyMMddHHmm");
-		SimpleDateFormat outTimeFormat = new SimpleDateFormat("HHmm");
 		String timeField = taskInfoVO.getSource().getTimeField();
+
 		Map<String, ParquetWriter<GenericData.Record>> writerMap = new HashMap<>();
 		Schema schema = null;
+
 		for (Map<String, Object> row: dataList) {
 			if (schema == null) {
 				FieldAssembler<Schema> fa = SchemaBuilder
@@ -66,23 +75,20 @@ public class Convert2Parquet implements IConverData {
 				}
 				schema = fa.endRecord();
 			}
-			long date;
+			String tmpPath;
 			try {
-				date = inFormat.parse(row.get(timeField).toString()).getTime() / (1000 * 60 * 10) * (1000 * 60 * 10);
+				tmpPath = this.generatePathStr(
+						inFormat.parse(row.get(timeField).toString()).getTime());
 			} catch (ParseException e1) {
-				log.warn("Cannot found timeField");
-				date = new Date().getTime();
+				log.warn(e1.getMessage());
+				tmpPath = "/tmp/unknown_time";
 			}
-			String dir = String.join("/", 
-					taskInfoVO.getTarget().getPath(), 
-					outDayFormat.format(date),
-					outTimeFormat.format(date));
 
-			if (writerMap.get(dir) == null) {
-				ParquetWriter<GenericData.Record> writer = this.createParquetWriter(dir, schema);
-				writerMap.put(dir, writer);
+			if (writerMap.get(tmpPath) == null) {
+				ParquetWriter<GenericData.Record> writer = this.createParquetWriter(tmpPath, schema);
+				writerMap.put(tmpPath, writer);
 			}
-			ParquetWriter<GenericData.Record> writer = writerMap.get(dir);
+			ParquetWriter<GenericData.Record> writer = writerMap.get(tmpPath);
 			GenericRecordBuilder record = new GenericRecordBuilder(schema);
 			for (Schema.Field f : schema.getFields()) {
 				switch (f.schema().getType()) {
@@ -133,7 +139,7 @@ public class Convert2Parquet implements IConverData {
 			writer.write(record.build());
 		}
 		List<Path> destPaths = new ArrayList<>();
-		for (Entry<String, ParquetWriter<Record>> entry: writerMap.entrySet()){
+		for (Entry<String, ParquetWriter<Record>> entry: writerMap.entrySet()) {
 			if (entry.getValue() != null) {
 				entry.getValue().close();
 			}
@@ -144,7 +150,15 @@ public class Convert2Parquet implements IConverData {
 		return destPaths;
 	}
 
-	private ParquetWriter<GenericData.Record> createParquetWriter(String dir, Schema schema) 
+	private String generatePathStr(long timestamp) {
+		timestamp = timestamp / (1000 * 60 * 10) * (1000 * 60 * 10);
+		return String.join("/",
+				taskInfoVO.getTarget().getPath(),
+				outDayFormat.format(timestamp),
+				outTimeFormat.format(timestamp));
+	}
+
+	private ParquetWriter<GenericData.Record> createParquetWriter(String dir, Schema schema)
 			throws IllegalArgumentException, IOException {
 		Configuration conf = new Configuration();
 		conf.set("parquet.strings.signed-min-max.enabled", "true");
