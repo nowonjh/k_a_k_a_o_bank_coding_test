@@ -1,4 +1,4 @@
-package com.kakao.codingtest.backup.worker;
+package com.kakao.codingtest.worker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -6,7 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.kakao.codingtest.config.vo.TaskInfoVO;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 import lombok.Getter;
 

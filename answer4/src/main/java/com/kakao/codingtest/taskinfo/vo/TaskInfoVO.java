@@ -1,4 +1,4 @@
-package com.kakao.codingtest.config.vo;
+package com.kakao.codingtest.taskinfo.vo;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

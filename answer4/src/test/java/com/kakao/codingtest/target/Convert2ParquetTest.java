@@ -29,9 +29,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.kakao.codingtest.config.vo.SourceVO;
-import com.kakao.codingtest.config.vo.TargetVO;
-import com.kakao.codingtest.config.vo.TaskInfoVO;
+import com.kakao.codingtest.taskinfo.vo.SourceVO;
+import com.kakao.codingtest.taskinfo.vo.TargetVO;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class Convert2ParquetTest {

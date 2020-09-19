@@ -1,17 +1,19 @@
-package com.kakao.codingtest.backup.worker;
+package com.kakao.codingtest.worker;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.kakao.codingtest.config.vo.TaskInfoVO;
-import com.kakao.codingtest.jdbc.DatabaseManager;
+import com.kakao.codingtest.jdbc.JdbcManager;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.worker.thread.JDBCWorkerThread;
+import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 public class JDBCWorker extends AWorker {
-	private DatabaseManager dbManager;
+	private JdbcManager jdbcManager;
 
-	public JDBCWorker(TaskInfoVO task, long now, DatabaseManager dbManager) {
+	public JDBCWorker(TaskInfoVO task, long now, JdbcManager jdbcManager) {
 		super(task, now);
-		this.dbManager = dbManager;
+		this.jdbcManager = jdbcManager;
 	}
 
 	@Override
@@ -19,7 +21,7 @@ public class JDBCWorker extends AWorker {
 		ExecutorService threadPool = Executors.newFixedThreadPool(super.getTask().getConcurrency());
 		for (RequestJDBCQueryVO queryVO: super.getQueries()) {
 			Thread jdbcWorkerThread = new JDBCWorkerThread(
-					super.getTask(), queryVO, this.dbManager);
+					super.getTask(), queryVO, this.jdbcManager);
 			threadPool.execute(jdbcWorkerThread);
 		}
 		threadPool.shutdown();

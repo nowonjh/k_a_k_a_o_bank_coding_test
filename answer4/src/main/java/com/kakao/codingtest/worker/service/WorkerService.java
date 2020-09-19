@@ -1,29 +1,32 @@
-package com.kakao.codingtest.backup.worker;
+package com.kakao.codingtest.worker.service;
 
 import java.util.Calendar;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kakao.codingtest.config.vo.TaskInfoVO;
-import com.kakao.codingtest.jdbc.DatabaseManager;
+import com.kakao.codingtest.jdbc.JdbcManager;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.worker.AWorker;
+import com.kakao.codingtest.worker.JDBCWorker;
+import com.kakao.codingtest.worker.SqoopWorker;
 
 /**
  * @author yuganji
  * 백업 작업을 실행하는 클래스
  */
 @Service
-public class BackupWorkerService {
+public class WorkerService {
 
 	@Autowired
-	private DatabaseManager dbManager;
+	private JdbcManager jdbcManager;
 
 	public void backup(long now, TaskInfoVO task) {
 		AWorker worker = null;
 		if (task.isUseSqoop()) {
 			worker = new SqoopWorker(task, now);
 		} else {
-			worker = new JDBCWorker(task, now, dbManager);
+			worker = new JDBCWorker(task, now, jdbcManager);
 		}
 		worker.start();
 	}

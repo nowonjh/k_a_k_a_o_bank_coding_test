@@ -1,4 +1,4 @@
-package com.kakao.codingtest.backup.worker;
+package com.kakao.codingtest.worker.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,17 +13,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.kakao.codingtest.config.vo.TaskInfoVO;
-import com.kakao.codingtest.task.TaskInfoManager;
+import com.kakao.codingtest.taskinfo.TaskInfoManager;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.worker.JDBCWorker;
+import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-class BackupWorkerServiceTest {
+class WorkerServiceTest {
 
 	@Autowired
-	private BackupWorkerService backupWorker;
+	private WorkerService workerService;
 
 	@Autowired
 	private TaskInfoManager taskInfoManager;
@@ -34,11 +36,11 @@ class BackupWorkerServiceTest {
 		taskInfoVO.setDelayMin(20);
 		taskInfoVO.setHourOfDay(3);
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		assertEquals(true, backupWorker.isTime(format.parse("2020-09-19 03:20:11").getTime(), taskInfoVO));
-		assertEquals(true, backupWorker.isTime(format.parse("2020-09-18 03:20:59").getTime(), taskInfoVO));
-		assertEquals(false, backupWorker.isTime(format.parse("2020-09-19 03:19:11").getTime(), taskInfoVO));
-		assertEquals(false, backupWorker.isTime(format.parse("2020-09-19 15:20:11").getTime(), taskInfoVO));
-		assertEquals(false, backupWorker.isTime(format.parse("2020-09-19 03:21:11").getTime(), taskInfoVO));
+		assertEquals(true, workerService.isTime(format.parse("2020-09-19 03:20:11").getTime(), taskInfoVO));
+		assertEquals(true, workerService.isTime(format.parse("2020-09-18 03:20:59").getTime(), taskInfoVO));
+		assertEquals(false, workerService.isTime(format.parse("2020-09-19 03:19:11").getTime(), taskInfoVO));
+		assertEquals(false, workerService.isTime(format.parse("2020-09-19 15:20:11").getTime(), taskInfoVO));
+		assertEquals(false, workerService.isTime(format.parse("2020-09-19 03:21:11").getTime(), taskInfoVO));
 	}
 
 	@Test

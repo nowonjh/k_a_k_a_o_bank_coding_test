@@ -26,7 +26,7 @@ import org.apache.parquet.hadoop.ParquetFileWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
-import com.kakao.codingtest.config.vo.TaskInfoVO;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 
 import lombok.extern.slf4j.Slf4j;
 

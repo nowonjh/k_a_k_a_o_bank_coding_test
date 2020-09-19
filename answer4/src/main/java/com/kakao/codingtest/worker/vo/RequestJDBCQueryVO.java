@@ -1,4 +1,4 @@
-package com.kakao.codingtest.backup.worker;
+package com.kakao.codingtest.worker.vo;
 
 import lombok.Builder;
 import lombok.Data;

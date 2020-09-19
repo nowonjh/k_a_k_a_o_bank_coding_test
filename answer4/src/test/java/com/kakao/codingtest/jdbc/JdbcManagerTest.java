@@ -8,17 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.kakao.codingtest.backup.worker.RequestJDBCQueryVO;
-import com.kakao.codingtest.config.vo.SourceVO;
-import com.kakao.codingtest.task.TaskInfoManager;
+import com.kakao.codingtest.taskinfo.TaskInfoManager;
+import com.kakao.codingtest.taskinfo.vo.SourceVO;
+import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-class DatabaseManagerTest {
+class JdbcManagerTest {
 	@Autowired
-	private DatabaseManager databaseManager;
+	private JdbcManager databaseManager;
 
 	@Autowired
 	private TaskInfoManager taskInfoManager;

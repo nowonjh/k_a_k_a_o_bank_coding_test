@@ -12,8 +12,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.kakao.codingtest.backup.worker.RequestJDBCQueryVO;
-import com.kakao.codingtest.config.vo.SourceVO;
+import com.kakao.codingtest.taskinfo.vo.SourceVO;
+import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class DatabaseManager {
+public class JdbcManager {
 	private Connection getConnection(SourceVO source) throws ClassNotFoundException, SQLException {
 		Connection con = null;
 		try {

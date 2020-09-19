@@ -1,4 +1,4 @@
-package com.kakao.codingtest.task;
+package com.kakao.codingtest.taskinfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakao.codingtest.config.vo.TaskInfoVO;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

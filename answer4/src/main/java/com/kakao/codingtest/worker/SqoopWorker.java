@@ -1,6 +1,6 @@
-package com.kakao.codingtest.backup.worker;
+package com.kakao.codingtest.worker;
 
-import com.kakao.codingtest.config.vo.TaskInfoVO;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 
 /**
  * @author yuganji

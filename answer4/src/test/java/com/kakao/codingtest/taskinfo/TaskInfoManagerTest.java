@@ -1,4 +1,4 @@
-package com.kakao.codingtest.task;
+package com.kakao.codingtest.taskinfo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,7 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.google.gson.Gson;
-import com.kakao.codingtest.config.vo.TaskInfoVO;
+import com.kakao.codingtest.taskinfo.TaskInfoManager;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 
 @SpringBootTest
 public class TaskInfoManagerTest {

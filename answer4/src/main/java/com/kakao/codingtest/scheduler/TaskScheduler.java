@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.kakao.codingtest.backup.worker.BackupWorkerService;
-import com.kakao.codingtest.config.vo.TaskInfoVO;
-import com.kakao.codingtest.task.TaskInfoManager;
+import com.kakao.codingtest.taskinfo.TaskInfoManager;
+import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.worker.service.WorkerService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,20 +16,20 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class BackupScheduler {
+public class TaskScheduler {
 	@Autowired
 	private TaskInfoManager taskInfoManager;
 
 	@Autowired
-	private BackupWorkerService backupWorker;
+	private WorkerService workerSerivce;
 
 	@Scheduled(fixedDelay = 1000 * 60 * 10)
 	public void schedule() {
 		long now = System.currentTimeMillis();
 		log.debug(taskInfoManager.getTaskList().toString());
 		for (TaskInfoVO task: taskInfoManager.getTaskList()) {
-			if (backupWorker.isTime(now, task)) {
-				backupWorker.backup(now, task);
+			if (workerSerivce.isTime(now, task)) {
+				workerSerivce.backup(now, task);
 			}
 		}
 	}
