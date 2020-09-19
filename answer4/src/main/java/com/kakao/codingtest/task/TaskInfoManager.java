@@ -1,4 +1,4 @@
-package com.kakao.codingtest.config;
+package com.kakao.codingtest.task;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class ConfigurationManager {
-	protected ObjectMapper objMapper = new ObjectMapper();
-	
+public class TaskInfoManager {
+	private ObjectMapper objMapper = new ObjectMapper();
+
 	@Getter
-	List<Map<String, TaskInfoVO>> taskList = null;
-	
+	private List<Map<String, TaskInfoVO>> taskList = null;
+
 	@PostConstruct
 	public void init() {
 		this.reload();
@@ -36,7 +36,7 @@ public class ConfigurationManager {
 	@Scheduled(fixedDelay = 60 * 1000)
 	public void reload() {
 		try {
-			this.taskList = objMapper.readValue(new File("./conf/configuration.json"), 
+			this.taskList = objMapper.readValue(new File("./conf/task_info.json"),
 					new ArrayList<Map<String, TaskInfoVO>>().getClass().asSubclass(List.class));
 		} catch (IOException e) {
 			if (this.taskList == null) {

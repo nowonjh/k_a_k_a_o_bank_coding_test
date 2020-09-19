@@ -7,7 +7,7 @@ import lombok.Data;
  *
  */
 @Data
-public class TargetTableVO {
+public class TargetVO {
 	private String target;
 	private String format;
 	private String path;

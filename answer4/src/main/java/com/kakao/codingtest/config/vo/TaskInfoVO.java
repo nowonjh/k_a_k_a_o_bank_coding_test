@@ -12,8 +12,13 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class TaskInfoVO {
+	private String name;
 	private int dealyMin;
-	private int schedule;
-	private SourceTableVO sourceTable;
-	private TargetTableVO targetTale;
+	private int period;
+	private int hourOfDay;
+	private int concurrency;
+	private boolean delete;
+	private boolean useSqoop;
+	private SourceVO sourceTable;
+	private TargetVO targetTable;
 }

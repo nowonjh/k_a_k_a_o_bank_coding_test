@@ -1,0 +1,27 @@
+[
+	{
+		"name" : "menu_log_ETL_Job",
+		"delay_min": 20,
+		"hour_of_day": 3,
+		"period": 86400,
+		"concurrency": 3,
+		"delete": true,
+		"use_sqoop": false,
+		"source": {
+			"type": "mysql",
+			"url": "jdbc:mysql://localhost:3306/kakaobank?characterEncoding=UTF-8&serverTimezone=UTC",
+			"driver_class_name": "com.mysql.cj.jdbc.Driver",
+			"username": "root",
+			"password": "wogurdl13",
+			"table_name": "menu_log",
+			"time_field": "",
+			"time_format:": "yyyyMMddHHmmss"
+		},
+		"target": {
+			"type": "hdfs",
+			"format": "parquet",
+			"path": "/data/menu_log/yyyyMMdd/HH.parquet"
+		}
+	}
+	
+]
