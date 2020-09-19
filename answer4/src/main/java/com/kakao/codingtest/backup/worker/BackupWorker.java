@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,8 @@ import org.springframework.stereotype.Service;
 
 import com.kakao.codingtest.config.vo.TaskInfoVO;
 import com.kakao.codingtest.jdbc.DatabaseManager;
-import com.kakao.codingtest.parquet.ConvertParquetUtil;
+import com.kakao.codingtest.target.Convert2Parquet;
+import com.kakao.codingtest.target.IConverData;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,27 +34,19 @@ public class BackupWorker {
 
 	@Autowired
 	private DatabaseManager dbManager;
+
 	public boolean backup(long now, TaskInfoVO task) {
-		long endTime = now / (60 * 60 * 1000) * (60 * 60 / 1000);
-		long startTime = endTime - task.getHourOfDay() * 1000;
-		List<RequestJDBCQueryVO> queryList = new ArrayList<>();
-		SimpleDateFormat dateFormat = new SimpleDateFormat(task.getSource().getTimeFormat());
-		while (startTime <= endTime) {
-			RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
-					.tableName(task.getSource().getTableName())
-					.timeField(task.getSource().getTimeField())
-					.startTime(dateFormat.format(new Date(startTime)))
-					.endTime(dateFormat.format(new Date(endTime)))
-					.build();
-			queryList.add(queryVO);
-			startTime += 60 * 1000 * 30;
+		IConverData convertData = null;
+		if (task.getTarget().getFormat().toLowerCase().equals("parquet")) {
+			convertData = new Convert2Parquet(task);
 		}
+		List<RequestJDBCQueryVO> queryList = this.listQueryVO(now, task);
 
 		for (RequestJDBCQueryVO queryVO: queryList) {
 			try {
 				FileSystem fs = FileSystem.get(new URI(task.getTarget().getUrl()), new Configuration());
 				List<Map<String, Object>> dataList = dbManager.query(task.getSource(), queryVO);
-				ConvertParquetUtil.mapToParquet(fs, task.getTarget().getPath(), dataList);
+				convertData.convertAndPushHDFS(fs, dataList);
 			} catch (ClassNotFoundException | SQLException e) {
 				log.error(e.getMessage(), e);
 			} catch (IOException e) {
@@ -63,7 +57,27 @@ public class BackupWorker {
 		}
 		return true;
 	}
-
+	
+	private List<RequestJDBCQueryVO> listQueryVO(long now, TaskInfoVO task) {
+		List<RequestJDBCQueryVO> queryList =  new ArrayList<>();
+		SimpleDateFormat dateFormat = new SimpleDateFormat(task.getSource().getTimeFormat());
+		now -= (task.getHourOfDay() * 1000 * 60 * 60) - (task.getDelayMin() * 1000 * 60);
+		long endTime = now / (60 * 60 * 1000L) * (60 * 60 * 1000L);
+		long startTime = endTime - (86400 * 1000L);
+		while (startTime < endTime) {
+			long tmpStartTime = startTime;
+			startTime += 1000 * 60 * 30;
+			RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
+					.tableName(task.getSource().getTableName())
+					.timeField(task.getSource().getTimeField())
+					.startTime(dateFormat.format(new Date(tmpStartTime)))
+					.endTime(dateFormat.format(new Date(startTime)))
+					.build();
+			queryList.add(queryVO);
+			
+		}
+		return queryList;
+	}
 	/**
 	 * hour_of_day	-	task를 실행시키는 시각
 	 * delay_main	-	source 데이터의 유입지연을 고려한 텀을 주기위한 시간
@@ -74,8 +88,10 @@ public class BackupWorker {
 	 * @return
 	 */
 	public boolean isTime(long now, TaskInfoVO task) {
-		if ((now - task.getHourOfDay() * 60 * 60 * 1000L) % (86400 * 1000L
-				+ task.getDelayMin() * 60 * 1000L) < 1000 * 60 * 10L) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(now);
+		if (cal.get(Calendar.HOUR_OF_DAY) == task.getHourOfDay()
+				&& cal.get(Calendar.MINUTE) == task.getDelayMin()) {
 			return true;
 		}
 		return false;
