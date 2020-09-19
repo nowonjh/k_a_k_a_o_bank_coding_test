@@ -18,7 +18,7 @@
 		},
 		"target": {
 			"type": "hdfs",
-			"url": "hdfs://localhost:8020",
+			"url": "hdfs://localhost:11000",
 			"format": "parquet",
 			"path": "/data/menu_log"
 		}
