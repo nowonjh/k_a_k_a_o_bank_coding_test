@@ -24,8 +24,6 @@ public abstract class AWorker extends Thread {
 		this.queries = this.listQueryVO();
 	}
 
-	abstract void work();
-
 	public List<RequestJDBCQueryVO> listQueryVO() {
 		if (task == null) {
 			return null;
