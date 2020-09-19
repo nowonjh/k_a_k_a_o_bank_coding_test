@@ -3,10 +3,15 @@
 > 문항별 디렉토리를 구분하였으며 각 문항별 파일 구성은 다음과 같습니다.
 
 ## [Answer1](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer1)
+
 [`/answer1/answer1.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1.sql) - SQL문
+
 [`/answer1/answer1_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_explain.json) - SQL 실행계획 JSON Format
+
 [`/answer1/answer1_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_explain.txt) - SQL 실행계획 Table Format
+
 [`/answer1/answer1_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_result.txt)  - SQL 실행 결과 JSON Format
+
 
 <details><summary>결과보기</summary>
 
@@ -24,17 +29,23 @@
 | Top10 메뉴   | 정기예금 (5)           | 내정보 (11)             | 카드이용내역 (3)       | -                      | 카드이용내역 (1)       | 정기예금 (1)           | -                   |
 
 </details>
+
 ---
+
 ## [Answer2](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer2)
+
 [`/answer2/answer2.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2.sql) - SQL문
+
 [`/answer2/answer2_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_explain.json) - SQL 실행계획 JSON Format
+
 [`/answer2/answer2_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_explain.txt) - SQL 실행계획 Table Format
+
 [`/answer2/answer2_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_result.txt)  - SQL 실행 결과 JSON Format
 
 <details><summary>결과보기</summary>
 
 | 메뉴명             | 이전 메뉴명        | 접근 건수     | 비율(%)   |
-| ------ | ------ | ------ | ------ |
+| ------ | ------ | -----: | -----: |
 | 가이드             | 세이프박스         |            11 |     23.91 |
 | 가이드             | 추천               |             9 |     19.56 |
 | 가이드             | 정기예금           |             5 |     10.86 |
@@ -136,16 +147,21 @@
 </details>
 
 ---
+
 ## [Answer3](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer3)
+
 [`/answer3/answer3.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3.sql) - SQL문
+
 [`/answer3/answer3_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_explain.json) - SQL 실행계획 JSON Format
+
 [`/answer3/answer3_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_explain.txt) - SQL 실행계획 Table Format
+
 [`/answer3/answer3_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_result.txt)  - SQL 실행 결과 JSON Format
 
 <details><summary>결과보기</summary>
 
 | 사용자번호      | 성별   | 나이   | 지역명    | 이전지역명      | 이동통신사명       | 가입일    | 최빈메뉴     | 최근메뉴           |
-| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| ----: | ----- | ----: | ----- | ----- | ----- | ----- | ----- | ----- |
 | 001             | 여     | 17     | 포천      | 연천            | LG                 | 20190301  | 추천         | 카드이용내역       |
 | 002             | 남     | 30     | 창원      | 김해            | 알뜰폰             | 20190311  | 정기예금     | 추천               |
 | 003             | 여     | 45     | 천안      | 용인            | KT                 | 20190305  | 이체내역     | 이체내역           |
@@ -154,8 +170,11 @@
 </details>
 
 ---
+
 ## [Answer4](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer4)
+
 > JSON에 정의한 Job테스크 내용을 기반으로 동작하는 어플리케이션을 개발하였으며 상세스펙은 다음과 같습니다.
+
 ##### 상세스펙
 * OpenJDK 1.8
 * MAVEN
@@ -164,6 +183,7 @@
 * Apache Hadoop 3.3.0
 * Apache Parquet 1.9.0
 * MySQL 8.0.21
+
 ---
 
 ##### Job Task 정의 JSON Sample 
