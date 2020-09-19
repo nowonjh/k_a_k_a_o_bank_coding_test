@@ -74,17 +74,18 @@ public class DatabaseManager {
 		sb.append(queryVO.getTableName());
 		sb.append(" WHERE ");
 		sb.append(queryVO.getTimeField());
-		sb.append(" BETWEEN ? TO ?");
+		sb.append(" BETWEEN ? AND ?");
 		PreparedStatement ps = con.prepareStatement(sb.toString());
 		ps.setFetchSize(2000);
 		ps.setString(1, queryVO.getStartTime());
 		ps.setString(2, queryVO.getEndTime());
+		log.debug("query: " + sb.toString());
 		ResultSet rs = ps.executeQuery();
 
 		List<Map<String, Object>> result = new ArrayList<>();
 		List<String> columns = new ArrayList<>();
 		for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-			columns.add(rs.getMetaData().getColumnName(i + 1));
+			columns.add(rs.getMetaData().getColumnName(i + 1).toLowerCase());
 		}
 		log.debug("Found colums:" + columns);
 		while (rs.next()) {
