@@ -3,9 +3,13 @@
 > 문항별 디렉토리를 구분하였으며 각 문항별 파일 구성은 다음과 같습니다.
 
 ## [Answer1](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer1)
+
 [`/answer1/answer1.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1.sql) - SQL문
+
 [`/answer1/answer1_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_explain.json) - SQL 실행계획 JSON Format
+
 [`/answer1/answer1_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_explain.txt) - SQL 실행계획 Table Format
+
 [`/answer1/answer1_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_result.txt)  - SQL 실행 결과 JSON Format
 
 | 구분         | 월                     | 화                      | 수                     | 목                     | 금                     | 토                     | 일                  |
@@ -23,9 +27,13 @@
 ---
 ## [Answer2](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer2)
 [`/answer2/answer2.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2.sql) - SQL문
+
 [`/answer2/answer2_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_explain.json) - SQL 실행계획 JSON Format
+
 [`/answer2/answer2_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_explain.txt) - SQL 실행계획 Table Format
+
 [`/answer2/answer2_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_result.txt)  - SQL 실행 결과 JSON Format
+
 | 메뉴명             | 이전 메뉴명        | 접근 건수     | 비율(%)   |
 | ------ | ------ | ------ | ------ |
 | 가이드             | 세이프박스         |            11 |     23.91 |
@@ -127,9 +135,13 @@
 | 카드이용내역       | 카드이용내역       |             1 |      3.44 |
 ---
 ## [Answer3](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer3)
+
 [`/answer3/answer3.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3.sql) - SQL문
+
 [`/answer3/answer3_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_explain.json) - SQL 실행계획 JSON Format
+
 [`/answer3/answer3_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_explain.txt) - SQL 실행계획 Table Format
+
 [`/answer3/answer3_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_result.txt)  - SQL 실행 결과 JSON Format
 
 | 사용자번호      | 성별   | 나이   | 지역명    | 이전지역명      | 이동통신사명       | 가입일    | 최빈메뉴     | 최근메뉴           |
