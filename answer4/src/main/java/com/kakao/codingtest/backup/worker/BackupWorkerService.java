@@ -23,50 +23,15 @@ public class BackupWorkerService {
 	private DatabaseManager dbManager;
 
 	public void backup(long now, TaskInfoVO task) {
-		IWorker worker = null;
+		AWorker worker = null;
 		if (task.isUseSqoop()) {
-			worker = new SqoopWorker(task);
+			worker = new SqoopWorker(task, now);
 		} else {
-			worker = new JDBCWorker(dbManager, task);
+			worker = new JDBCWorker(task, now, dbManager);
 		}
-		List<RequestJDBCQueryVO> queryList = this.listQueryVO(now, task);
-		worker.work(queryList);
+		worker.start();
 	}
 
-	private List<RequestJDBCQueryVO> listQueryVO(long now, TaskInfoVO task) {
-		List<RequestJDBCQueryVO> queryList =  new ArrayList<>();
-		SimpleDateFormat dateFormat = new SimpleDateFormat(task.getSource().getTimeFormat());
-		now -= (task.getHourOfDay() * 1000 * 60 * 60) - (task.getDelayMin() * 1000 * 60);
-		long endTime = now / (60 * 60 * 1000L) * (60 * 60 * 1000L);
-		long startTime = endTime - (86400 * 1000L);
-
-		if (task.isUseSqoop()) {
-			RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
-					.tableName(task.getSource().getTableName())
-					.timeField(task.getSource().getTimeField())
-					.startTime(dateFormat.format(new Date(startTime)))
-					.endTime(dateFormat.format(new Date(endTime)))
-					.build();
-			queryList.add(queryVO);
-			return queryList;
-		}
-		while (startTime < endTime) {
-			long tmpStartTime = startTime;
-			if (this.getHour(startTime) <= 6) {
-				startTime += 1000 * 60 * 60 * 3;
-			} else {
-				startTime += 1000 * 60 * 20;
-			}
-			RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
-					.tableName(task.getSource().getTableName())
-					.timeField(task.getSource().getTimeField())
-					.startTime(dateFormat.format(new Date(tmpStartTime)))
-					.endTime(dateFormat.format(new Date(startTime)))
-					.build();
-			queryList.add(queryVO);
-		}
-		return queryList;
-	}
 	/**
 	 * hour_of_day	-	task를 실행시키는 시각
 	 * delay_main	-	source 데이터의 유입지연을 고려한 텀을 주기위한 시간
@@ -83,11 +48,5 @@ public class BackupWorkerService {
 			return true;
 		}
 		return false;
-	}
-
-	public int getHour(long timestamp) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timestamp);
-		return cal.get(Calendar.HOUR_OF_DAY);
 	}
 }

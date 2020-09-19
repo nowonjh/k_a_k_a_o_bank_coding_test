@@ -18,29 +18,27 @@ import com.kakao.codingtest.target.IConvertData;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class JDBCWorker implements IWorker {
-
+public class JDBCWorker extends AWorker {
 	private DatabaseManager dbManager;
-	private TaskInfoVO task;
 
-	public JDBCWorker(DatabaseManager dbManager, TaskInfoVO task) {
+	public JDBCWorker(TaskInfoVO task, long now, DatabaseManager dbManager) {
+		super(task, now);
 		this.dbManager = dbManager;
-		this.task = task;
 	}
 
 	@Override
-	public void work(List<RequestJDBCQueryVO> queryList) {
+	void work() {
 		IConvertData convertData = null;
-		if (task.getTarget().getFormat().toLowerCase().equals("parquet")) {
-			convertData = new Convert2Parquet(task);
-		} else if (task.getTarget().getFormat().toLowerCase().equals("csv")) {
+		if (super.getTask().getTarget().getFormat().toLowerCase().equals("parquet")) {
+			convertData = new Convert2Parquet(super.getTask());
+		} else if (super.getTask().getTarget().getFormat().toLowerCase().equals("csv")) {
 			// TODO 파일 포맷이 parquet가 아닐때...
 		}
 
-		for (RequestJDBCQueryVO queryVO: queryList) {
+		for (RequestJDBCQueryVO queryVO: super.getQueries()) {
 			try {
-				FileSystem fs = FileSystem.get(new URI(task.getTarget().getUrl()), new Configuration());
-				List<Map<String, Object>> dataList = dbManager.query(task.getSource(), queryVO);
+				FileSystem fs = FileSystem.get(new URI(super.getTask().getTarget().getUrl()), new Configuration());
+				List<Map<String, Object>> dataList = dbManager.query(super.getTask().getSource(), queryVO);
 				convertData.convertAndPushHDFS(fs, dataList);
 			} catch (ClassNotFoundException | SQLException e) {
 				log.error(e.getMessage(), e);
@@ -51,5 +49,4 @@ public class JDBCWorker implements IWorker {
 			}
 		}
 	}
-
 }
