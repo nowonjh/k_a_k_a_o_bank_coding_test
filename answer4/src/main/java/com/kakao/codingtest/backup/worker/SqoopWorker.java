@@ -11,8 +11,7 @@ public class SqoopWorker extends AWorker {
 	}
 
 	@Override
-	void work() {
+	public void run() {
 		// TODO sqoop 사용일 경우에 대한 처리
 	}
-
 }

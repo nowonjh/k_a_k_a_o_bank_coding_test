@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,26 +29,10 @@ public class JDBCWorker extends AWorker {
 	}
 
 	@Override
-	void work() {
-		IConvertData convertData = null;
-		if (super.getTask().getTarget().getFormat().toLowerCase().equals("parquet")) {
-			convertData = new Convert2Parquet(super.getTask());
-		} else if (super.getTask().getTarget().getFormat().toLowerCase().equals("csv")) {
-			// TODO 파일 포맷이 parquet가 아닐때...
-		}
-
-		for (RequestJDBCQueryVO queryVO: super.getQueries()) {
-			try {
-				FileSystem fs = FileSystem.get(new URI(super.getTask().getTarget().getUrl()), new Configuration());
-				List<Map<String, Object>> dataList = dbManager.query(super.getTask().getSource(), queryVO);
-				convertData.convertAndPushHDFS(fs, dataList);
-			} catch (ClassNotFoundException | SQLException e) {
-				log.error(e.getMessage(), e);
-			} catch (IOException e) {
-				log.error(e.getMessage(), e);
-			} catch (URISyntaxException e) {
-				log.error(e.getMessage(), e);
-			}
-		}
+	public void run() {
+		ExecutorService threadPool = Executors.newFixedThreadPool(super.getTask().getConcurrency());
+		Thread jdbcWorkerThread = new JDBCWorkerThread(
+				super.getTask(), super.getQueries(), this.dbManager);
+		threadPool.execute(jdbcWorkerThread);
 	}
 }
