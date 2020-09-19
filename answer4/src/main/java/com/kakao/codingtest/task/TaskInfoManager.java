@@ -36,7 +36,7 @@ public class TaskInfoManager {
 	public void reload() {
 		try {
 			this.taskList = objMapper.readValue(new File("./conf/task_info.json"),
-					new TypeReference<List<TaskInfoVO>>(){});
+					new TypeReference<List<TaskInfoVO>>() { });
 		} catch (IOException e) {
 			if (this.taskList == null) {
 				log.error(e.getMessage(), e);

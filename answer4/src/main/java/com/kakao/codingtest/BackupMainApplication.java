@@ -5,12 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+
 @SpringBootApplication (scanBasePackages = {"com.kakao"})
 @EnableScheduling
-public class BackupApplication {
-
+public class BackupMainApplication {
 	public static void main(String[] args) {
-		final SpringApplication application = new SpringApplication(BackupApplication.class);
+		final SpringApplication application = new SpringApplication(BackupMainApplication.class);
 		application.addListeners(new ApplicationPidFileWriter());
 		application.run(args);
 	}
