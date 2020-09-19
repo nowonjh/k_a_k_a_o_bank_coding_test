@@ -173,9 +173,9 @@
 
 ## [Answer4](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/tree/master/answer4)
 
-> JSON에 정의한 Job테스크 내용을 기반으로 동작하는 어플리케이션을 개발하였으며 상세스펙은 다음과 같습니다.
+> JSON에 정의한 Job테스크 내용을 기반으로 MySQL의 데이터를 HDFS로 저장 하는 어플리케이션을 구현하였으며 상세스펙은 다음과 같습니다.
 
-##### 상세스펙
+### 상세스펙
 * OpenJDK 1.8
 * MAVEN
 * SpringBoot Framework 2.3.0
@@ -186,7 +186,7 @@
 
 ---
 
-##### Job Task 정의 JSON Sample 
+### Job Task 정의 JSON Sample 
 
 <details><summary>보기</summary>
 
@@ -219,7 +219,7 @@
 	
 ]
 ```
-JSON 정의에 따른 Object 클래스
+### JSON 정의에 따른 Object 클래스
 * [TaskInfoVO.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/vo/TaskInfoVO.java)
     * [SourceVO.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/vo/SourceVO.java)
     * [TargetVO.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/vo/TargetVO.java)
@@ -227,7 +227,7 @@ JSON 정의에 따른 Object 클래스
 </details>
 
 ---
-##### 기능 리스트
+### 기능 리스트
 * [Job Task정의 JSON](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/conf/task_info.json) 파일을 주기적(1분)으로 Reloading하며 캐싱 -  [TaskInfoManager.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
 * 매 10분 마다 각 Job Task 들이 동작해야 하는 시간인지를 체크하여
 실제 Task를 작업하는 Worker를 실행 - [TaskScheduler.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/scheduler/TaskScheduler.java)
@@ -240,7 +240,7 @@ JSON 정의에 따른 Object 클래스
     * Parquet 압축률 및 테스트 데이터 셋의 컬럼 갯수를 고려했을때에는 오히려 HDFS에 작은 파일이 많아질수 있어 실제 상황에 맞는 판단이 필요함.
     * 데이터의 저장목적에 따라 꼭 시간기준이 아닌 적절한 파티셔닝을 한다면 좋을 것 같음.
 
-##### 추가 구현 필요
+### 추가 구현 필요
 * Apache Sqoop 사용 활성화 (use_sqoop: true) 에 대한 처리
 * Export에 성공한 데이터(MySQL)에 대한 삭제.
 * (Optional) Export해야 하는 데이터의 양을 먼저 측정하여 적정량의 데이터로 나누어 쿼리하는 기능
