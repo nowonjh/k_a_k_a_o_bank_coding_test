@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class TaskInfoManager {
 	private ObjectMapper objMapper = new ObjectMapper();
-
+	private String taskInfoPath = "./conf/task_info.json";
 	@Getter
 	private List<TaskInfoVO> taskList = null;
 
@@ -35,7 +35,7 @@ public class TaskInfoManager {
 	@Scheduled(fixedDelay = 60 * 1000)
 	public void reload() {
 		try {
-			this.taskList = objMapper.readValue(new File("./conf/task_info.json"),
+			this.taskList = objMapper.readValue(new File(this.taskInfoPath),
 					new TypeReference<List<TaskInfoVO>>() { });
 		} catch (IOException e) {
 			if (this.taskList == null) {
