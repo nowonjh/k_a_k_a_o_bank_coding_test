@@ -20,15 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JDBCWorkerThread extends Thread {
 	private TaskInfoVO taskInfoVO;
-	private List<RequestJDBCQueryVO> queryList;
+	private RequestJDBCQueryVO queryVO;
 	private DatabaseManager dbManager;
 
 	public JDBCWorkerThread(
 			TaskInfoVO taskInfoVO,
-			List<RequestJDBCQueryVO> queryList,
+			RequestJDBCQueryVO queryVO,
 			DatabaseManager dbManager) {
 		this.taskInfoVO = taskInfoVO;
-		this.queryList = queryList;
+		this.queryVO = queryVO;
 		this.dbManager = dbManager;
 	}
 
@@ -40,19 +40,18 @@ public class JDBCWorkerThread extends Thread {
 		} else if (this.taskInfoVO.getTarget().getFormat().toLowerCase().equals("csv")) {
 			// TODO 파일 포맷이 parquet가 아닐때...
 		}
-		for (RequestJDBCQueryVO queryVO: this.queryList) {
-			try {
-				FileSystem fs = FileSystem.get(new URI(this.taskInfoVO.getTarget().getUrl()), new Configuration());
-				List<Map<String, Object>> dataList = dbManager.query(
-						this.taskInfoVO.getSource(), queryVO);
-				convertData.convertAndPushHDFS(fs, dataList);
-			} catch (ClassNotFoundException | SQLException e) {
-				log.error(e.getMessage(), e);
-			} catch (IOException e) {
-				log.error(e.getMessage(), e);
-			} catch (URISyntaxException e) {
-				log.error(e.getMessage(), e);
-			}
+
+		try {
+			FileSystem fs = FileSystem.get(new URI(this.taskInfoVO.getTarget().getUrl()), new Configuration());
+			List<Map<String, Object>> dataList = dbManager.query(
+					this.taskInfoVO.getSource(), queryVO);
+			convertData.convertAndPushHDFS(fs, dataList);
+		} catch (ClassNotFoundException | SQLException e) {
+			log.error(e.getMessage(), e);
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		} catch (URISyntaxException e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 }
