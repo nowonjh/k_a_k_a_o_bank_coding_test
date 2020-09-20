@@ -235,7 +235,7 @@
 실제 Task를 작업하는 `Worker`를 실행시킴 - [TaskScheduler.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/scheduler/TaskScheduler.java)
     * 작동하는 기준시각은 매일 0시를 기준으로 함.
     * `period_hour` - 동작하는 주기 시간. ex) 24시간, 48시간, 100시간 등
-    * `delay_min` - ntp동기화 미적용 등에 의해 정확한 시간에 실행할경우 데이터 유실이 발생할수 있기 때문에 delay를 주는 옵션 
+    * `delay_min` - ntp동기화 미적용 등에 의해 정확한 시간에 실행할경우 데이터 유실이 발생할수 있기 때문에 delay를 주는 옵션, 또한 부하가 큰 작업인만큼 부하가 상대적으로 낮은 새벽에 진행하도록 하기 위함. 
     * (`현재시간(timestamp)` + `timezone gap (9시간)` - `delay_min`) %
     `period_hour` <= `5분` 을 만족하면 실행.
 * 쿼리의 부하를 고려하여 `period_hour` 범위의 쿼리를 여러개로 분할 -  [AWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
