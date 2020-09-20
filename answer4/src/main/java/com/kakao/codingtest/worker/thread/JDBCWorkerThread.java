@@ -14,6 +14,7 @@ import com.kakao.codingtest.jdbc.JdbcManager;
 import com.kakao.codingtest.target.Convert2Parquet;
 import com.kakao.codingtest.target.IConvertData;
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.util.Constants;
 import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +37,11 @@ public class JDBCWorkerThread extends Thread {
     @Override
     public void run() {
         IConvertData convertData = null;
-        if (this.taskInfoVO.getTarget().getFormat().toLowerCase().equals("parquet")) {
+        String targetFormat = this.taskInfoVO.getTarget().getFormat().toLowerCase();
+
+        if (targetFormat.equals(Constants.TargetFileFormat.PARQUET.getValue())) {
             convertData = new Convert2Parquet(this.taskInfoVO);
-        } else if (this.taskInfoVO.getTarget().getFormat().toLowerCase().equals("csv")) {
+        } else if (targetFormat.equals(Constants.TargetFileFormat.CSV.getValue())) {
             // TODO 파일 포맷이 parquet가 아닐때...
         }
 

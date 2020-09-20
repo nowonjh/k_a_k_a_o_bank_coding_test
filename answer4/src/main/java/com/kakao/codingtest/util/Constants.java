@@ -42,4 +42,18 @@ public final class Constants {
             return this.getValue();
         }
     }
+
+    public enum TargetFileFormat {
+        PARQUET("parquet"),
+        CSV("csv");
+        @Getter
+        private final String value;
+        TargetFileFormat(String val) {
+            this.value = val;
+        }
+        @Override
+        public String toString() {
+            return this.getValue();
+        }
+    }
 }
