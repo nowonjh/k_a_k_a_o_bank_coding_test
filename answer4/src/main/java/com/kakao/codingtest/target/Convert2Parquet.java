@@ -144,7 +144,9 @@ public class Convert2Parquet implements IConvertData {
             if (entry.getValue() != null) {
                 entry.getValue().close();
             }
-            String destFile = entry.getKey() + "_" + RandomStringUtils.random(5, true, false) + ".parquet";
+            String destFile =
+                    entry.getKey() + "_"
+                            + RandomStringUtils.random(5, true, false) + Constants.SUFFIX_PARQUET;
             fileSystem.rename(new Path(entry.getKey()), new Path(destFile));
             destPaths.add(new Path(destFile));
         }
