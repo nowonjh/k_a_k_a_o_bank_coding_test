@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -65,14 +67,36 @@ public class TaskInfoManager {
     }
 
     public boolean validCheck(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
+       boolean result = true;
+        result = result && this.isValidName(taskInfoVO);
+        result = result && this.isValidDelayMin(taskInfoVO);
+        result = result && this.isValidPeriodHour(taskInfoVO);
+        result = result && this.isValidConcurrency(taskInfoVO);
+        result = result && this.isValidConnector(taskInfoVO);
+        result = result && this.isValidTargetType(taskInfoVO);
+        result = result && this.isValidTargetFormat(taskInfoVO);
+        return result;
+    }
+
+    private boolean isValidName(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
         if (taskInfoVO.getName() == null) {
             throw new TaskInfoValidateException(
-                    "\"name\" is not defined" + taskInfoVO.toString());
-        } else if (taskInfoVO.getDelayMin() * Constants.MILLIS_1MIN > Constants.MILLIS_1DAY) {
+                    "\"name\" is not defined." + taskInfoVO.toString());
+        }
+        return true;
+    }
+
+    private boolean isValidDelayMin(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
+        if (taskInfoVO.getDelayMin() * Constants.MILLIS_1MIN > Constants.MILLIS_1DAY) {
             throw new TaskInfoValidateException(
                     "\"delay_min\" is too large. "
                     + "It shuold be less than 1day. [" + taskInfoVO.getName() + "]");
-        } else if (taskInfoVO.getPeriodHour() * Constants.MILLIS_1HOUR
+        }
+        return true;
+    }
+
+    private boolean isValidPeriodHour(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
+        if (taskInfoVO.getPeriodHour() * Constants.MILLIS_1HOUR
                 > Constants.MILLIS_1DAY * 7) {
             throw new TaskInfoValidateException(
                     "\"period_hour\" is too large. "
@@ -80,11 +104,50 @@ public class TaskInfoManager {
         } else if (taskInfoVO.getPeriodHour() <= 0) {
             throw new TaskInfoValidateException(
                     "\"period_hour\" shuold be lager than 0. [" + taskInfoVO.getName() + "]");
-        } else if (taskInfoVO.getConcurrency() >= Runtime.getRuntime().availableProcessors() / 2) {
+        }
+        return true;
+    }
+    private boolean isValidConcurrency(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
+        if (taskInfoVO.getConcurrency() >= Runtime.getRuntime().availableProcessors() / 2) {
             throw new TaskInfoValidateException(
                     "\"concurrency\" is too large. "
                     + "It should be less than half the number of processors. "
                     + "[" + taskInfoVO.getName() + "]");
+        }
+        return true;
+    }
+
+    private boolean isValidConnector(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
+        List<String> connectorList =
+                Stream.of(Constants.ConnectorType.values())
+                .map(x -> x.getValue()).collect(Collectors.toList());
+        if (!connectorList.contains(taskInfoVO.getConnector().toLowerCase())) {
+            throw new TaskInfoValidateException(
+                    "\"connector\" must be one of these connectors. "
+                    + connectorList.toString());
+        }
+        return true;
+    }
+    private boolean isValidTargetType(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
+        List<String> targetTypeList =
+                Stream.of(Constants.TargetType.values())
+                .map(x -> x.getValue()).collect(Collectors.toList());
+        if (!targetTypeList.contains(taskInfoVO.getTarget().getType().toLowerCase())) {
+            throw new TaskInfoValidateException(
+                    "\"target\"->\"type\" must be one of these connectors. "
+                    + targetTypeList.toString());
+        }
+        return true;
+    }
+
+    private boolean isValidTargetFormat(TaskInfoVO taskInfoVO) throws TaskInfoValidateException {
+        List<String> targetFileFormatList =
+                Stream.of(Constants.TargetFileFormat.values())
+                .map(x -> x.getValue()).collect(Collectors.toList());
+        if (!targetFileFormatList.contains(taskInfoVO.getTarget().getFormat().toLowerCase())) {
+            throw new TaskInfoValidateException(
+                    "\"target\"->\"format\" must be one of these connectors. "
+                    + targetFileFormatList.toString());
         }
         return true;
     }

@@ -16,6 +16,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.google.gson.Gson;
 import com.kakao.codingtest.exception.TaskInfoValidateException;
+import com.kakao.codingtest.taskinfo.vo.TargetVO;
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 
 @SpringBootTest
@@ -48,12 +49,16 @@ public class TaskInfoManagerTest {
 
     @Test()
     void validateCheck() {
-        System.out.println(Runtime.getRuntime().availableProcessors());
         TaskInfoVO taskInfoVO = new TaskInfoVO();
         taskInfoVO.setDelayMin(10);
         taskInfoVO.setName("Test");
         taskInfoVO.setPeriodHour(24);
         taskInfoVO.setConcurrency(1);
+        taskInfoVO.setConnector("jdbc");
+        TargetVO targetVO = new TargetVO();
+        targetVO.setType("hdfs");
+        targetVO.setFormat("parquet");
+        taskInfoVO.setTarget(targetVO);
         // Normal Until here
 
         taskInfoVO.setConcurrency(8);
@@ -84,6 +89,42 @@ public class TaskInfoManagerTest {
         taskInfoVO.setName("Test");
 
         taskInfoVO.setDelayMin(1441);
+        assertThrows(
+                TaskInfoValidateException.class,
+                () -> {
+                    taskInfoManager.validCheck(taskInfoVO); });
+    }
+
+    @Test
+    void validateCheckWithConstant() {
+        TaskInfoVO taskInfoVO = new TaskInfoVO();
+        taskInfoVO.setDelayMin(10);
+        taskInfoVO.setName("Test");
+        taskInfoVO.setPeriodHour(24);
+        taskInfoVO.setConcurrency(1);
+        taskInfoVO.setConnector("jdbc");
+        TargetVO targetVO = new TargetVO();
+        targetVO.setType("hdfs");
+        targetVO.setFormat("parquet");
+        taskInfoVO.setTarget(targetVO);
+
+        taskInfoVO.setConnector("java");
+        assertThrows(
+                TaskInfoValidateException.class,
+                () -> {
+                    taskInfoManager.validCheck(taskInfoVO); });
+        taskInfoVO.setConnector("jdbc");
+
+        targetVO.setType("java");
+        taskInfoVO.setTarget(targetVO);
+        assertThrows(
+                TaskInfoValidateException.class,
+                () -> {
+                    taskInfoManager.validCheck(taskInfoVO); });
+
+        targetVO.setType("hdfs");
+        targetVO.setFormat("json");
+        taskInfoVO.setTarget(targetVO);
         assertThrows(
                 TaskInfoValidateException.class,
                 () -> {
