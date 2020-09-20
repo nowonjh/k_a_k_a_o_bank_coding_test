@@ -11,10 +11,12 @@ public final class Constants {
     public static final long MILLIS_1HOUR = MILLIS_1MIN * 60;
     public static final long MILLIS_1DAY = MILLIS_1HOUR * 24;
 
+    public static final String SUFFIX_PARQUET = ".parquet";
+
     public enum TargetType {
-        HDFS("mem"),
-        LOCAL("count"),
-        AWS_S3("s3"),
+        HDFS("hdfs"),
+        LOCAL("local"),
+        AWS_S3("aws_s3"),
         SAMBA("samba");
 
         @Getter
