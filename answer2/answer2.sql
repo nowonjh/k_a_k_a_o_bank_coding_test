@@ -8,8 +8,8 @@ FROM (
     SELECT
         log_id,
         menu_nm,
-        LAG(menu_nm)
-        OVER(ORDER BY usr_no, log_id) AS lag_menu_nm
+        LAG(menu_nm, 1, null)
+        OVER(PARTITION BY usr_no ORDER BY usr_no, log_id) AS lag_menu_nm
     FROM
         MENU_LOG
 ) t1

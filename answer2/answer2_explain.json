@@ -64,6 +64,7 @@
                       "using_filesort": true,
                       "filesort_key": [
                         "`USR_NO`",
+                        "`USR_NO`",
                         "`LOG_ID`"
                       ],
                       "frame_buffer": {
