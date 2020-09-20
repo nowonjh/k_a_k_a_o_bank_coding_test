@@ -14,7 +14,7 @@ import lombok.Data;
 public class TaskInfoVO {
 	private String name;
 	private int delayMin;
-	private int hourOfDay;
+	private int periodHour;
 	private int concurrency;
 	private boolean delete;
 	private boolean useSqoop;

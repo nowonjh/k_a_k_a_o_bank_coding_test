@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.util.Constants;
 import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 import lombok.Getter;
@@ -31,9 +32,8 @@ public abstract class AWorker extends Thread {
 		}
 		List<RequestJDBCQueryVO> queryList =  new ArrayList<>();
 		SimpleDateFormat dateFormat = new SimpleDateFormat(task.getSource().getTimeFormat());
-		now -= (task.getHourOfDay() * 1000 * 60 * 60) - (task.getDelayMin() * 1000 * 60);
-		long endTime = now / (60 * 60 * 1000L) * (60 * 60 * 1000L);
-		long startTime = endTime - (86400 * 1000L);
+		long endTime = now - task.getDelayMin() * Constants.MILLIS_1MIN;
+		long startTime = endTime - (task.getPeriodHour() * Constants.MILLIS_1HOUR);
 
 		if (task.isUseSqoop()) {
 			RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
@@ -48,9 +48,9 @@ public abstract class AWorker extends Thread {
 		while (startTime < endTime) {
 			long tmpStartTime = startTime;
 			if (this.getHour(startTime) <= 6) {
-				startTime += 1000 * 60 * 60 * 3;
+				startTime += Constants.MILLIS_1HOUR * 3;
 			} else {
-				startTime += 1000 * 60 * 20;
+				startTime += Constants.MILLIS_1MIN * 20;
 			}
 			RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
 					.tableName(task.getSource().getTableName())

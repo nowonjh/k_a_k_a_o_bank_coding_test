@@ -1,12 +1,11 @@
 package com.kakao.codingtest.worker.service;
 
-import java.util.Calendar;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.kakao.codingtest.jdbc.JdbcManager;
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.util.Constants;
 import com.kakao.codingtest.worker.AWorker;
 import com.kakao.codingtest.worker.JDBCWorker;
 import com.kakao.codingtest.worker.SqoopWorker;
@@ -32,7 +31,7 @@ public class WorkerService {
 	}
 
 	/**
-	 * hour_of_day	-	task를 실행시키는 시각
+	 * perioid_hour	-	task가 동작하는 주기
 	 * delay_main	-	source 데이터의 유입지연을 고려한 텀을 주기위한 시간
 	 * 2 가지의 값을 가지고 동작을 할지 말지 판단함.
 	 * @param now  현재시각 timestamp
@@ -40,10 +39,10 @@ public class WorkerService {
 	 * @return
 	 */
 	public boolean isTime(long now, TaskInfoVO task) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(now);
-		if (cal.get(Calendar.HOUR_OF_DAY) == task.getHourOfDay()
-				&& cal.get(Calendar.MINUTE) == task.getDelayMin()) {
+		now += Constants.MILLIS_1HOUR * 9;
+		now -= Constants.MILLIS_1MIN * task.getDelayMin();
+		if (now % (Constants.MILLIS_1HOUR * task.getPeriodHour())
+				<= Constants.MILLIS_1MIN * 5) {
 			return true;
 		}
 		return false;
