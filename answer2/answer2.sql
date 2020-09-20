@@ -15,6 +15,7 @@ FROM (
 ) t1
 WHERE
     t1.lag_menu_nm IS NOT NULL
+    AND t1.lag_menu_nm <> 'logout'
 GROUP BY
     t1.menu_nm, t1.lag_menu_nm
 ORDER BY

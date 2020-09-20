@@ -2,7 +2,7 @@
   "query_block": {
     "select_id": 1,
     "cost_info": {
-      "query_cost": "659.61"
+      "query_cost": "601.20"
     },
     "ordering_operation": {
       "using_filesort": true,
@@ -25,7 +25,7 @@
           }
         ],
         "cost_info": {
-          "sort_cost": "584.10"
+          "sort_cost": "525.69"
         },
         "grouping_operation": {
           "using_temporary_table": true,
@@ -34,20 +34,20 @@
             "table_name": "t1",
             "access_type": "ALL",
             "rows_examined_per_scan": 649,
-            "rows_produced_per_join": 584,
-            "filtered": "90.00",
+            "rows_produced_per_join": 525,
+            "filtered": "81.00",
             "cost_info": {
-              "read_cost": "17.10",
-              "eval_cost": "58.41",
+              "read_cost": "22.94",
+              "eval_cost": "52.57",
               "prefix_cost": "75.51",
-              "data_read_per_join": "282K"
+              "data_read_per_join": "254K"
             },
             "used_columns": [
               "log_id",
               "menu_nm",
               "lag_menu_nm"
             ],
-            "attached_condition": "(`t1`.`lag_menu_nm` is not null)",
+            "attached_condition": "((`t1`.`lag_menu_nm` is not null) and (`t1`.`lag_menu_nm` <> 'logout'))",
             "materialized_from_subquery": {
               "using_temporary_table": true,
               "dependent": false,
