@@ -7,7 +7,7 @@
 	* [`/answer1/answer1.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1.sql) - SQL문
 	* [`/answer1/answer1_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_explain.json) - SQL 실행계획 JSON Format
 	* [`/answer1/answer1_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_explain.txt) - SQL 실행계획 Table Format
-	* [`/answer1/answer1_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_result.txt)  - SQL 실행 결과 JSON Format
+	* [`/answer1/answer1_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer1/answer1_result.txt)  - SQL 실행 결과
 
 
 <details><summary>결과보기</summary>
@@ -34,7 +34,7 @@
 	* [`/answer2/answer2.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2.sql) - SQL문
 	* [`/answer2/answer2_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_explain.json) - SQL 실행계획 JSON Format
 	* [`/answer2/answer2_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_explain.txt) - SQL 실행계획 Table Format
-	* [`/answer2/answer2_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_result.txt)  - SQL 실행 결과 JSON Format
+	* [`/answer2/answer2_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer2/answer2_result.txt)  - SQL 실행 결과
 
 <details><summary>결과보기</summary>
 
@@ -154,7 +154,7 @@
 	* [`/answer3/answer3.sql`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3.sql) - SQL문
 	* [`/answer3/answer3_explain.json`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_explain.json) - SQL 실행계획 JSON Format
 	* [`/answer3/answer3_explain.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_explain.txt) - SQL 실행계획 Table Format
-	* [`/answer3/answer3_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_result.txt)  - SQL 실행 결과 JSON Format
+	* [`/answer3/answer3_result.txt`](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer3/answer3_result.txt)  - SQL 실행 결과
 
 <details><summary>결과보기</summary>
 
@@ -230,22 +230,23 @@
 
 ---
 ### 기능 리스트
-* [Job Task정의 JSON](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/conf/task_info.json) 파일을 주기적(1분)으로 Reloading하며 캐싱 -  [TaskInfoManager.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
+* [Job Task정의 JSON](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/conf/task_info.json) 파일을 주기적(1분)으로 갱신하며 캐싱 -  [TaskInfoManager.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
     * 캐싱하기 전 데이터에 대한 유효성 검사를 진행
-* 매 10분 마다 각 Job Task 들이 동작해야 하는 시간인지를 체크하여
-실제 Task를 작업하는 Worker를 실행 - [TaskScheduler.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/scheduler/TaskScheduler.java)
-    * 작동하는 기준시각은 매일 0시를 기준
+* 매 10분 마다 각 `Job Task` 들이 동작해야 하는 시간인지를 체크하여
+실제 Task를 작업하는 `Worker`를 실행시킴 - [TaskScheduler.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/scheduler/TaskScheduler.java)
+    * 작동하는 기준시각은 매일 0시를 기준으로 함.
     * `period_hour` - 동작하는 주기 시간. ex) 24시간, 48시간, 100시간 등
-    * `delay_min` - ntp동기화 미적용 등에 의해 정확한 시간에 실행할경우 데이터 로스가 발생하기 때문에 delay를 주는 옵션 
+    * `delay_min` - ntp동기화 미적용 등에 의해 정확한 시간에 실행할경우 데이터 유실이 발생할수 있기 때문에 delay를 주는 옵션 
     * (`현재시간(timestamp)` + `timezone gap (9시간)` - `delay_min`) %
     `period_hour` <= `5분` 을 만족하면 실행.
-* 쿼리의 부하를 고려하여 1일치 쿼리를 여러개로 분할 -  [AWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
+* 쿼리의 부하를 고려하여 `period_hour` 범위의 쿼리를 여러개로 분할 -  [AWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
     * 데이터의 유입이 많아 지는 시간대를 지정 `begin_load_hour`, `end_load_hour`
     * 각각 6, 24 로 지정할경우
        * 06시 부터 00시까지는 각 쿼리를 20분으로 나누어 쿼리
        * 나머지는 3시간씩 나누어 쿼리.
-* 쿼리의 추가 조건이 있을경우 `additional_query` 항목을 통해 추가 `where`절을 지정
-* 쿼리를 하고 데이터를 Parquet로 변환하여 HDFS에 저장하는 [JdbcWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/worker/JDBCWorker.java)는 ThreadPool을 이용하여 설정된 값(concurrency: int)에 따라 병렬로 실행.
+       * 시간별 데이터분포가 극단적으로 차이날것으로 예상
+* 쿼리의 추가 조건이 필요한 경우 `additional_query` 항목을 통해 추가 `where`절을 지정
+* 쿼리 결과를 Parquet로 변환하여 HDFS에 저장하는 [JdbcWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/worker/JDBCWorker.java)는 ThreadPool을 이용하여 설정된 값(concurrency: int)에 따라 병렬로 실행.
 * 쿼리 결과 ResultSet의 columns metadata를 추출하여 `List<Map<String, Object>>` 형태로 데이터 셋을 리턴([JdbcManager.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/jdbc/JdbcManager.java)) 하며 이 결과를 가지고 Parquet로 변환 및 저장 ([Convert2Parquet.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/target/Convert2Parquet.java))
 * HFDS 저장시 추후 특정 시간 파일들만을 읽는 것을 고려하여 `${configure.path}/yyyyMMdd/HHmm_${random.5.char}.parquet` 형태로 저장되며 매 10분의 데이터들이 함께 모여 있음. `ex) 00시10분 ~ 00시19분 파일은 00시10분 파일에 함께 저장.`
     * Parquet 압축률 및 테스트 데이터 셋의 컬럼 갯수를 고려했을때에는 오히려 HDFS에 작은 파일이 많아질수 있어 실제 상황에 맞는 판단이 필요함.
