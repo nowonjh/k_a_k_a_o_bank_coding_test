@@ -29,7 +29,7 @@ public class TaskScheduler {
 		log.debug(taskInfoManager.getTaskList().toString());
 		for (TaskInfoVO task: taskInfoManager.getTaskList()) {
 			if (workerSerivce.isTime(now, task)) {
-				workerSerivce.backup(now, task);
+				workerSerivce.run(now, task);
 			}
 		}
 	}

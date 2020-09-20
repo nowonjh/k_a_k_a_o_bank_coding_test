@@ -21,7 +21,7 @@ public class WorkerService {
 	@Autowired
 	private JdbcManager jdbcManager;
 
-	public void backup(long now, TaskInfoVO task) {
+	public void run(long now, TaskInfoVO task) {
 		AWorker worker = null;
 		if (task.isUseSqoop()) {
 			worker = new SqoopWorker(task, now);
