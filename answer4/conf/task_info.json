@@ -14,7 +14,8 @@
 			"password": "<password>",
 			"table_name": "menu_log",
 			"time_field": "log_tktm",
-			"time_format": "yyyyMMddHHmmss"
+			"time_format": "yyyyMMddHHmmss",
+			"additional_query": "menu_nm <> 'logout'"
 		},
 		"target": {
 			"type": "hdfs",

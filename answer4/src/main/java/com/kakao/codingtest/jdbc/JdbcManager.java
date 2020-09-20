@@ -72,7 +72,12 @@ public class JdbcManager {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT * FROM ");
         sb.append(queryVO.getTableName());
-        sb.append(" WHERE ");
+        sb.append(" WHERE 1 = 1");
+        if (sourceVO.getAdditionalQuery().length() > 0) {
+            sb.append(" AND ");
+            sb.append(sourceVO.getAdditionalQuery());
+        }
+        sb.append(" AND ");
         sb.append(queryVO.getTimeField());
         sb.append(" BETWEEN ? AND ?");
         PreparedStatement ps = con.prepareStatement(sb.toString());
