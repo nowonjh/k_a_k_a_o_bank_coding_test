@@ -255,4 +255,7 @@
 ### 추가 구현 필요
 * Apache Sqoop, Apache Spark Connector 사용에 대한 처리
 * Export에 성공한 데이터(MySQL)에 대한 삭제.
+* 현재 Parquet로 저장시 모두 String 문자열로 저장하고 있는데
+  mysql 쿼리시 metadata를 통해 데이터의 타입을 확인하여 데이터 타입에 대한 schema 적용 필요.
 * (Optional) Export해야 하는 데이터의 양을 먼저 측정하여 적정량의 데이터로 나누어 쿼리하는 기능
+
