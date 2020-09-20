@@ -20,5 +20,7 @@ public class SourceVO {
     private String tableName;
     private String timeField;
     private String timeFormat;
+    private int beginLoadHour;
+    private int endLoadHour;
     private String additionalQuery;
 }

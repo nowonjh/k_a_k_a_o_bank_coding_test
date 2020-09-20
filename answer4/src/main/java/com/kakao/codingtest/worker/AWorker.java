@@ -35,7 +35,8 @@ public abstract class AWorker extends Thread {
         long endTime = now - task.getDelayMin() * Constants.MILLIS_1MIN;
         long startTime = endTime - (task.getPeriodHour() * Constants.MILLIS_1HOUR);
 
-        if (task.getConnector().equals(Constants.ConnectorType.SQOOP.getValue())) {
+        if (task.getConnector().toLowerCase().equals(
+                Constants.ConnectorType.SQOOP.getValue())) {
             RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
                     .tableName(task.getSource().getTableName())
                     .timeField(task.getSource().getTimeField())
@@ -47,10 +48,12 @@ public abstract class AWorker extends Thread {
         }
         while (startTime < endTime) {
             long tmpStartTime = startTime;
-            if (this.getHour(startTime) <= 6) {
-                startTime += Constants.MILLIS_1HOUR * 3;
-            } else {
+            int hour = this.getHour(startTime);
+            if (hour >= task.getSource().getBeginLoadHour()
+                    && hour < task.getSource().getEndLoadHour()) {
                 startTime += Constants.MILLIS_1MIN * 20;
+            } else {
+                startTime += Constants.MILLIS_1HOUR * 3;
             }
             RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
                     .tableName(task.getSource().getTableName())

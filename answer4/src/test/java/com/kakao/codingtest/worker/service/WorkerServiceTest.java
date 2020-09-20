@@ -66,11 +66,14 @@ class WorkerServiceTest {
         TaskInfoVO taskInfoVO = new TaskInfoVO();
         taskInfoVO.setDelayMin(200);
         taskInfoVO.setPeriodHour(24);
+        taskInfoVO.setConnector("jdbc");
         SourceVO sourceVO = new SourceVO();
 
         sourceVO.setTableName("menu_log");
         sourceVO.setTimeField("log_tktm");
         sourceVO.setTimeFormat("yyyyMMddHHmmss");
+        sourceVO.setBeginLoadHour(6);
+        sourceVO.setEndLoadHour(24);
         taskInfoVO.setSource(sourceVO);
         long time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2020-09-19 03:20:00").getTime();
 
@@ -92,10 +95,11 @@ class WorkerServiceTest {
             Calendar endCal = Calendar.getInstance();
             startCal.setTimeInMillis(dateFormat.parse(queryVO.getStartTime()).getTime());
             endCal.setTimeInMillis(dateFormat.parse(queryVO.getEndTime()).getTime());
-            if (startCal.get(Calendar.HOUR_OF_DAY) <= 6) {
-                assertEquals(Constants.MILLIS_1HOUR * 3L, endCal.getTimeInMillis() - startCal.getTimeInMillis());
-            } else {
+            if (startCal.get(Calendar.HOUR_OF_DAY) >= taskInfoVO.getSource().getBeginLoadHour()
+                    && startCal.get(Calendar.HOUR_OF_DAY) < taskInfoVO.getSource().getEndLoadHour()) {
                 assertEquals(Constants.MILLIS_1MIN * 20L, endCal.getTimeInMillis() - startCal.getTimeInMillis());
+            } else {
+                assertEquals(Constants.MILLIS_1HOUR * 3L, endCal.getTimeInMillis() - startCal.getTimeInMillis());
             }
         }
     }
