@@ -17,29 +17,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootTest
 class JdbcManagerTest {
-	@Autowired
-	private JdbcManager databaseManager;
+    @Autowired
+    private JdbcManager databaseManager;
 
-	@Autowired
-	private TaskInfoManager taskInfoManager;
+    @Autowired
+    private TaskInfoManager taskInfoManager;
 
-	@Test
-	void query() {
-		SourceVO sourceVO = taskInfoManager.getTaskList().get(0).getSource();
-		RequestJDBCQueryVO requestJDBCQueryVO =
-				RequestJDBCQueryVO.builder()
-					.tableName("menu_log")
-					.timeField("log_tktm")
-					.startTime("20190301000000")
-					.endTime("20190329000000")
-					.build();
-		try {
-			assertEquals(635, databaseManager.query(sourceVO, requestJDBCQueryVO).size());
-		} catch (ClassNotFoundException e) {
-			log.error(e.getMessage(), e);
-			e.printStackTrace();
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+    @Test
+    void query() {
+        SourceVO sourceVO = taskInfoManager.getTaskList().get(0).getSource();
+        RequestJDBCQueryVO requestJDBCQueryVO =
+                RequestJDBCQueryVO.builder()
+                    .tableName("menu_log")
+                    .timeField("log_tktm")
+                    .startTime("20190301000000")
+                    .endTime("20190329000000")
+                    .build();
+        try {
+            assertEquals(635, databaseManager.query(sourceVO, requestJDBCQueryVO).size());
+        } catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+            e.printStackTrace();
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }

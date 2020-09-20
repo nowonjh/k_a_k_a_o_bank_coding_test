@@ -20,27 +20,27 @@ import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 @SpringBootTest
 public class TaskInfoManagerTest {
 
-	@Autowired
-	private TaskInfoManager taskInfoManager;
+    @Autowired
+    private TaskInfoManager taskInfoManager;
 
-	@Test()
-	void reloadWrongFile() {
-		List<TaskInfoVO> origin = taskInfoManager.getTaskList();
-		ReflectionTestUtils.setField(taskInfoManager, "taskInfoPath", "./conf/xxx.conf");
-		taskInfoManager.reload();
-		assertEquals(origin, taskInfoManager.getTaskList());
-	}
+    @Test()
+    void reloadWrongFile() {
+        List<TaskInfoVO> origin = taskInfoManager.getTaskList();
+        ReflectionTestUtils.setField(taskInfoManager, "taskInfoPath", "./conf/xxx.conf");
+        taskInfoManager.reload();
+        assertEquals(origin, taskInfoManager.getTaskList());
+    }
 
-	@Test()
-	void reloadWrongFile2() throws IOException {
-		List<TaskInfoVO> origin = taskInfoManager.getTaskList();
-		Gson gson = new Gson();
-		String data = gson.toJson(origin);
-		data = data.replaceAll("3", "true");
-		String testConfPath = "./conf/test_conf.json";
-		FileUtils.write(new File(testConfPath), data, Charset.defaultCharset());
-		ReflectionTestUtils.setField(taskInfoManager, "taskInfoPath", testConfPath);
-		taskInfoManager.reload();
-		assertEquals(origin, taskInfoManager.getTaskList());
-	}
+    @Test()
+    void reloadWrongFile2() throws IOException {
+        List<TaskInfoVO> origin = taskInfoManager.getTaskList();
+        Gson gson = new Gson();
+        String data = gson.toJson(origin);
+        data = data.replaceAll("3", "true");
+        String testConfPath = "./conf/test_conf.json";
+        FileUtils.write(new File(testConfPath), data, Charset.defaultCharset());
+        ReflectionTestUtils.setField(taskInfoManager, "taskInfoPath", testConfPath);
+        taskInfoManager.reload();
+        assertEquals(origin, taskInfoManager.getTaskList());
+    }
 }

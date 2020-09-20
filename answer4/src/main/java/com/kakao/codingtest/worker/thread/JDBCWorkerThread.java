@@ -20,39 +20,39 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JDBCWorkerThread extends Thread {
-	private TaskInfoVO taskInfoVO;
-	private RequestJDBCQueryVO queryVO;
-	private JdbcManager jdbcManager;
+    private TaskInfoVO taskInfoVO;
+    private RequestJDBCQueryVO queryVO;
+    private JdbcManager jdbcManager;
 
-	public JDBCWorkerThread(
-			TaskInfoVO taskInfoVO,
-			RequestJDBCQueryVO queryVO,
-			JdbcManager jdbcManager) {
-		this.taskInfoVO = taskInfoVO;
-		this.queryVO = queryVO;
-		this.jdbcManager = jdbcManager;
-	}
+    public JDBCWorkerThread(
+            TaskInfoVO taskInfoVO,
+            RequestJDBCQueryVO queryVO,
+            JdbcManager jdbcManager) {
+        this.taskInfoVO = taskInfoVO;
+        this.queryVO = queryVO;
+        this.jdbcManager = jdbcManager;
+    }
 
-	@Override
-	public void run() {
-		IConvertData convertData = null;
-		if (this.taskInfoVO.getTarget().getFormat().toLowerCase().equals("parquet")) {
-			convertData = new Convert2Parquet(this.taskInfoVO);
-		} else if (this.taskInfoVO.getTarget().getFormat().toLowerCase().equals("csv")) {
-			// TODO 파일 포맷이 parquet가 아닐때...
-		}
+    @Override
+    public void run() {
+        IConvertData convertData = null;
+        if (this.taskInfoVO.getTarget().getFormat().toLowerCase().equals("parquet")) {
+            convertData = new Convert2Parquet(this.taskInfoVO);
+        } else if (this.taskInfoVO.getTarget().getFormat().toLowerCase().equals("csv")) {
+            // TODO 파일 포맷이 parquet가 아닐때...
+        }
 
-		try {
-			FileSystem fs = FileSystem.get(new URI(this.taskInfoVO.getTarget().getUrl()), new Configuration());
-			List<Map<String, Object>> dataList = jdbcManager.query(
-					this.taskInfoVO.getSource(), queryVO);
-			convertData.convertAndPushHDFS(fs, dataList);
-		} catch (ClassNotFoundException | SQLException e) {
-			log.error(e.getMessage(), e);
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-		} catch (URISyntaxException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+        try {
+            FileSystem fs = FileSystem.get(new URI(this.taskInfoVO.getTarget().getUrl()), new Configuration());
+            List<Map<String, Object>> dataList = jdbcManager.query(
+                    this.taskInfoVO.getSource(), queryVO);
+            convertData.convertAndPushHDFS(fs, dataList);
+        } catch (ClassNotFoundException | SQLException e) {
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }

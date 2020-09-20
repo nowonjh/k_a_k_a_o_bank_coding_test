@@ -12,8 +12,8 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class TargetVO {
-	private String type;
-	private String url;
-	private String format;
-	private String path;
+    private String type;
+    private String url;
+    private String format;
+    private String path;
 }

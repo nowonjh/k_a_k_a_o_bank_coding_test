@@ -18,20 +18,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service(value = "jobTaskScheduler")
 public class TaskScheduler {
-	@Autowired
-	private TaskInfoManager taskInfoManager;
+    @Autowired
+    private TaskInfoManager taskInfoManager;
 
-	@Autowired
-	private WorkerService workerSerivce;
+    @Autowired
+    private WorkerService workerSerivce;
 
-	@Scheduled(fixedDelay = Constants.MILLIS_1MIN * 10)
-	public void schedule() {
-		long now = System.currentTimeMillis();
-		log.debug(taskInfoManager.getTaskList().toString());
-		for (TaskInfoVO task: taskInfoManager.getTaskList()) {
-			if (workerSerivce.isTime(now, task)) {
-				workerSerivce.run(now, task);
-			}
-		}
-	}
+    @Scheduled(fixedDelay = Constants.MILLIS_1MIN * 10)
+    public void schedule() {
+        long now = System.currentTimeMillis();
+        log.debug(taskInfoManager.getTaskList().toString());
+        for (TaskInfoVO task: taskInfoManager.getTaskList()) {
+            if (workerSerivce.isTime(now, task)) {
+                workerSerivce.run(now, task);
+            }
+        }
+    }
 }

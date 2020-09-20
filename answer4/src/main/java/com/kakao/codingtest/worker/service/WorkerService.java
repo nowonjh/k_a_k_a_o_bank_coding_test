@@ -17,34 +17,34 @@ import com.kakao.codingtest.worker.SqoopWorker;
 @Service
 public class WorkerService {
 
-	@Autowired
-	private JdbcManager jdbcManager;
+    @Autowired
+    private JdbcManager jdbcManager;
 
-	public void run(long now, TaskInfoVO task) {
-		AWorker worker = null;
-		if (task.isUseSqoop()) {
-			worker = new SqoopWorker(task, now);
-		} else {
-			worker = new JDBCWorker(task, now, jdbcManager);
-		}
-		worker.start();
-	}
+    public void run(long now, TaskInfoVO task) {
+        AWorker worker = null;
+        if (task.isUseSqoop()) {
+            worker = new SqoopWorker(task, now);
+        } else {
+            worker = new JDBCWorker(task, now, jdbcManager);
+        }
+        worker.start();
+    }
 
-	/**
-	 * perioid_hour	-	task가 동작하는 주기
-	 * delay_main	-	source 데이터의 유입지연을 고려한 텀을 주기위한 시간
-	 * 2 가지의 값을 가지고 동작을 할지 말지 판단함.
-	 * @param now  현재시각 timestamp
-	 * @param task task infomation
-	 * @return
-	 */
-	public boolean isTime(long now, TaskInfoVO task) {
-		now += Constants.MILLIS_1HOUR * 9;
-		now -= Constants.MILLIS_1MIN * task.getDelayMin();
-		if (now % (Constants.MILLIS_1HOUR * task.getPeriodHour())
-				<= Constants.MILLIS_1MIN * 5) {
-			return true;
-		}
-		return false;
-	}
+    /**
+     * perioid_hour    -    task가 동작하는 주기
+     * delay_main    -    source 데이터의 유입지연을 고려한 텀을 주기위한 시간
+     * 2 가지의 값을 가지고 동작을 할지 말지 판단함.
+     * @param now  현재시각 timestamp
+     * @param task task infomation
+     * @return
+     */
+    public boolean isTime(long now, TaskInfoVO task) {
+        now += Constants.MILLIS_1HOUR * 9;
+        now -= Constants.MILLIS_1MIN * task.getDelayMin();
+        if (now % (Constants.MILLIS_1HOUR * task.getPeriodHour())
+                <= Constants.MILLIS_1MIN * 5) {
+            return true;
+        }
+        return false;
+    }
 }

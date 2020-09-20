@@ -9,9 +9,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication (scanBasePackages = {"com.kakao"})
 @EnableScheduling
 public class MainApplication {
-	public static void main(String[] args) {
-		final SpringApplication application = new SpringApplication(MainApplication.class);
-		application.addListeners(new ApplicationPidFileWriter());
-		application.run(args);
-	}
+    public static void main(String[] args) {
+        final SpringApplication application = new SpringApplication(MainApplication.class);
+        application.addListeners(new ApplicationPidFileWriter());
+        application.run(args);
+    }
 }

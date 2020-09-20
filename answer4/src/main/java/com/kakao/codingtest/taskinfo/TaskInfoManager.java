@@ -24,26 +24,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class TaskInfoManager {
-	private ObjectMapper objMapper = new ObjectMapper();
-	private String taskInfoPath = "./conf/task_info.json";
-	@Getter
-	private List<TaskInfoVO> taskList = null;
+    private ObjectMapper objMapper = new ObjectMapper();
+    private String taskInfoPath = "./conf/task_info.json";
+    @Getter
+    private List<TaskInfoVO> taskList = null;
 
-	@PostConstruct
-	public void init() {
-		this.reload();
-	}
-	@Scheduled(fixedDelay = Constants.MILLIS_1MIN)
-	public void reload() {
-		try {
-			this.taskList = objMapper.readValue(new File(this.taskInfoPath),
-					new TypeReference<List<TaskInfoVO>>() { });
-		} catch (IOException e) {
-			if (this.taskList == null) {
-				log.error(e.getMessage(), e);
-				System.exit(0);
-			}
-			log.warn("Didn't reload configuration.json.", e);
-		}
-	}
+    @PostConstruct
+    public void init() {
+        this.reload();
+    }
+    @Scheduled(fixedDelay = Constants.MILLIS_1MIN)
+    public void reload() {
+        try {
+            this.taskList = objMapper.readValue(new File(this.taskInfoPath),
+                    new TypeReference<List<TaskInfoVO>>() { });
+        } catch (IOException e) {
+            if (this.taskList == null) {
+                log.error(e.getMessage(), e);
+                System.exit(0);
+            }
+            log.warn("Didn't reload configuration.json.", e);
+        }
+    }
 }
