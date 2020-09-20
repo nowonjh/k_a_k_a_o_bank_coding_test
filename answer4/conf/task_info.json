@@ -2,7 +2,7 @@
 	{
 		"name" : "menu_log_ETL_Job",
 		"delay_min": 20,
-		"hour_of_day": 3,
+		"period_hour": 24,
 		"concurrency": 3,
 		"delete": true,
 		"use_sqoop": false,
