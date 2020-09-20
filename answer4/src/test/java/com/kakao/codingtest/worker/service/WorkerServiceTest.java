@@ -9,12 +9,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.hadoop.mapreduce.jobhistory.JobHistoryParser.TaskInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.kakao.codingtest.taskinfo.TaskInfoManager;
 import com.kakao.codingtest.taskinfo.vo.SourceVO;
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 import com.kakao.codingtest.util.Constants;
@@ -29,9 +27,6 @@ class WorkerServiceTest {
 
     @Autowired
     private WorkerService workerService;
-
-    @Autowired
-    private TaskInfoManager taskInfoManager;
 
     @Test
     void isTimeTest() throws ParseException {
@@ -103,6 +98,5 @@ class WorkerServiceTest {
                 assertEquals(Constants.MILLIS_1MIN * 20L, endCal.getTimeInMillis() - startCal.getTimeInMillis());
             }
         }
-        
     }
 }
