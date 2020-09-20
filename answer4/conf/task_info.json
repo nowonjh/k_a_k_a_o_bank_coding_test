@@ -4,7 +4,7 @@
         "delay_min": 20,
         "period_hour": 24,
         "concurrency": 3,
-        "delete": true,
+        "delete_after_stored": true,
         "connector": "jdbc",
         "source": {
             "type": "mysql",

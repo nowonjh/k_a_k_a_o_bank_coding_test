@@ -16,7 +16,7 @@ public class TaskInfoVO {
     private int delayMin;
     private int periodHour;
     private int concurrency;
-    private boolean delete;
+    private boolean deleteAfterStored;
     private String connector;
     private SourceVO source;
     private TargetVO target;
