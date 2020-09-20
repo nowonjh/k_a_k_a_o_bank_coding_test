@@ -6,9 +6,10 @@ public final class Constants {
 	private Constants() {
 		throw new IllegalStateException("Constants is utility class");
 	}
-	public static final long MILLIS_1MIN = 1000 * 60;
+	public static final long MILLIS_1SEC = 1000;
+	public static final long MILLIS_1MIN = MILLIS_1SEC * 60;
 	public static final long MILLIS_1HOUR = MILLIS_1MIN * 60;
-	public static final long MILLIS_DAY = MILLIS_1HOUR * 24;
+	public static final long MILLIS_1DAY = MILLIS_1HOUR * 24;
 
 	public enum TargetType {
 		HDFS("mem"),
