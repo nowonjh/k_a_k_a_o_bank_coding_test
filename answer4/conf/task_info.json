@@ -11,7 +11,7 @@
 			"url": "jdbc:mysql://localhost:3306/kakaobank?characterEncoding=UTF-8&serverTimezone=UTC",
 			"driver_class_name": "com.mysql.cj.jdbc.Driver",
 			"username": "root",
-			"password": "wogurdl13",
+			"password": "<password>",
 			"table_name": "menu_log",
 			"time_field": "log_tktm",
 			"time_format": "yyyyMMddHHmmss"
