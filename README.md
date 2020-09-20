@@ -168,12 +168,12 @@
 
 ### 상세스펙
 * OpenJDK 1.8
-* MAVEN
 * SpringBoot Framework 2.3.0
-* lombok 1.18.4
+* MAVEN
 * Apache Hadoop 3.3.0
 * Apache Parquet 1.9.0
 * MySQL 8.0.21
+* lombok 1.18.4
 
 ---
 
@@ -183,32 +183,36 @@
 
 ```json
 [
-	{
-		"name" : "menu_log_ETL_Job",
-		"delay_min": 20,
-		"hour_of_day": 3,
-		"concurrency": 3,
-		"delete": true,
-		"use_sqoop": false,
-		"source": {
-			"type": "mysql",
-			"url": "jdbc:mysql://localhost:3306/kakaobank?characterEncoding=UTF-8&serverTimezone=UTC",
-			"driver_class_name": "com.mysql.cj.jdbc.Driver",
-			"username": "root",
-			"password": "<password>",
-			"table_name": "menu_log",
-			"time_field": "log_tktm",
-			"time_format": "yyyyMMddHHmmss"
-		},
-		"target": {
-			"type": "hdfs",
-			"url": "hdfs://localhost:11000",
-			"format": "parquet",
-			"path": "/data/menu_log"
-		}
-	}
-	
+    {
+        "name" : "menu_log_ETL_Job",
+        "delay_min": 20,
+        "period_hour": 24,
+        "concurrency": 3,
+        "delete": true,
+        "connector": "jdbc",
+        "source": {
+            "type": "mysql",
+            "url": "jdbc:mysql://localhost:3306/kakaobank?characterEncoding=UTF-8&serverTimezone=UTC",
+            "driver_class_name": "com.mysql.cj.jdbc.Driver",
+            "username": "root",
+            "password": "<password>",
+            "table_name": "menu_log",
+            "time_field": "log_tktm",
+            "time_format": "yyyyMMddHHmmss",
+            "begin_load_hour": 6,
+            "end_load_hour": 24,
+            "additional_query": "menu_nm <> 'logout'"
+        },
+        "target": {
+            "type": "hdfs",
+            "url": "hdfs://localhost:11000",
+            "format": "parquet",
+            "path": "/data/menu_log"
+        }
+    }
+    
 ]
+
 ```
 ### JSON 정의에 따른 Object 클래스
 * [TaskInfoVO.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/vo/TaskInfoVO.java)
@@ -220,11 +224,20 @@
 ---
 ### 기능 리스트
 * [Job Task정의 JSON](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/conf/task_info.json) 파일을 주기적(1분)으로 Reloading하며 캐싱 -  [TaskInfoManager.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
+    * 캐싱하기 전 데이터에 대한 유효성 검사를 진행
 * 매 10분 마다 각 Job Task 들이 동작해야 하는 시간인지를 체크하여
 실제 Task를 작업하는 Worker를 실행 - [TaskScheduler.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/scheduler/TaskScheduler.java)
+    * 작동하는 기준시각은 매일 0시를 기준
+    * `period_hour` - 동작하는 주기 시간. ex) 24시간, 48시간, 100시간 등
+    * `delay_min` - ntp동기화 미적용 등에 의해 정확한 시간에 실행할경우 데이터 로스가 발생하기 때문에 delay를 주는 옵션 
+    * (`현재시간(timestamp)` + `timezone gap (9시간)` - `delay_min`) %
+    `period_hour` <= `5분` 을 만족하면 실행.
 * 쿼리의 부하를 고려하여 1일치 쿼리를 여러개로 분할 -  [AWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
-    * 데이터 유입이 적은 시간대 (00시~06시) 는 3시간 나누어 쿼리
-    * 그외의 시간에는 20분씩 나누어 쿼리
+    * 데이터의 유입이 많아 지는 시간대를 지정 `begin_load_hour`, `end_load_hour`
+    * 각각 6, 24 로 지정할경우
+       * 06시 부터 00시까지는 각 쿼리를 20분으로 나누어 쿼리
+       * 나머지는 3시간씩 나누어 쿼리.
+* 쿼리의 추가 조건이 있을경우 `additional_query` 항목을 통해 추가 `where`절을 지정
 * 쿼리를 하고 데이터를 Parquet로 변환하여 HDFS에 저장하는 [JdbcWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/worker/JDBCWorker.java)는 ThreadPool을 이용하여 설정된 값(concurrency: int)에 따라 병렬로 실행.
 * 쿼리 결과 ResultSet의 columns metadata를 추출하여 `List<Map<String, Object>>` 형태로 데이터 셋을 리턴([JdbcManager.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/jdbc/JdbcManager.java)) 하며 이 결과를 가지고 Parquet로 변환 및 저장 ([Convert2Parquet.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/target/Convert2Parquet.java))
 * HFDS 저장시 추후 특정 시간 파일들만을 읽는 것을 고려하여 `${configure.path}/yyyyMMdd/HHmm_${random.5.char}.parquet` 형태로 저장되며 매 10분의 데이터들이 함께 모여 있음. `ex) 00시10분 ~ 00시19분 파일은 00시10분 파일에 함께 저장.`
@@ -232,6 +245,6 @@
     * 데이터의 저장목적에 따라 꼭 시간기준이 아닌 적절한 파티셔닝을 한다면 좋을 것 같음.
 
 ### 추가 구현 필요
-* Apache Sqoop 사용 활성화 (use_sqoop: true) 에 대한 처리
+* Apache Sqoop, Apache Spark Connector 사용에 대한 처리
 * Export에 성공한 데이터(MySQL)에 대한 삭제.
 * (Optional) Export해야 하는 데이터의 양을 먼저 측정하여 적정량의 데이터로 나누어 쿼리하는 기능
