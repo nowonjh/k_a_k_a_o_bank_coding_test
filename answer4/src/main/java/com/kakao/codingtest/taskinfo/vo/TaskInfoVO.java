@@ -17,7 +17,7 @@ public class TaskInfoVO {
     private int periodHour;
     private int concurrency;
     private boolean delete;
-    private boolean useSqoop;
+    private String connector;
     private SourceVO source;
     private TargetVO target;
 }

@@ -35,7 +35,7 @@ public abstract class AWorker extends Thread {
         long endTime = now - task.getDelayMin() * Constants.MILLIS_1MIN;
         long startTime = endTime - (task.getPeriodHour() * Constants.MILLIS_1HOUR);
 
-        if (task.isUseSqoop()) {
+        if (task.getConnector().equals(Constants.ConnectorType.SQOOP.getValue())) {
             RequestJDBCQueryVO queryVO = RequestJDBCQueryVO.builder()
                     .tableName(task.getSource().getTableName())
                     .timeField(task.getSource().getTimeField())

@@ -10,10 +10,13 @@ import com.kakao.codingtest.worker.AWorker;
 import com.kakao.codingtest.worker.JDBCWorker;
 import com.kakao.codingtest.worker.SqoopWorker;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author yuganji
  * 백업 작업을 실행하는 클래스
  */
+@Slf4j
 @Service
 public class WorkerService {
 
@@ -22,12 +25,20 @@ public class WorkerService {
 
     public void run(long now, TaskInfoVO task) {
         AWorker worker = null;
-        if (task.isUseSqoop()) {
+        if (task.getConnector().equals(Constants.ConnectorType.SQOOP.getValue())) {
             worker = new SqoopWorker(task, now);
-        } else {
+        } else if (task.getConnector().equals(Constants.ConnectorType.JDBC.getValue())) {
             worker = new JDBCWorker(task, now, jdbcManager);
+        } else if (task.getConnector().equals(Constants.ConnectorType.SPARK.getValue())) {
+            worker = new SparkWorker(task, now);
         }
-        worker.start();
+        if (worker != null) {
+            worker.start();
+        } else {
+            log.error("Job task could not be completed. "
+                    + "please check connector type. "
+                    + "[" + task.getName() + "]");
+        }
     }
 
     /**

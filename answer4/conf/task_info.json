@@ -5,7 +5,7 @@
 		"period_hour": 24,
 		"concurrency": 3,
 		"delete": true,
-		"use_sqoop": false,
+		"connector": "jdbc",
 		"source": {
 			"type": "mysql",
 			"url": "jdbc:mysql://localhost:3306/kakaobank?characterEncoding=UTF-8&serverTimezone=UTC",
