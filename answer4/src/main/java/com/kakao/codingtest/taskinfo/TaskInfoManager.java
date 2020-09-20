@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.util.Constants;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class TaskInfoManager {
 	public void init() {
 		this.reload();
 	}
-	@Scheduled(fixedDelay = 60 * 1000)
+	@Scheduled(fixedDelay = Constants.MILLIS_1MIN)
 	public void reload() {
 		try {
 			this.taskList = objMapper.readValue(new File(this.taskInfoPath),

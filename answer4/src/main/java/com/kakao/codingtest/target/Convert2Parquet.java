@@ -27,6 +27,7 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
+import com.kakao.codingtest.util.Constants;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -151,7 +152,7 @@ public class Convert2Parquet implements IConvertData {
 	}
 
 	private String generatePathStr(long timestamp) {
-		timestamp = timestamp / (1000 * 60 * 10) * (1000 * 60 * 10);
+		timestamp = timestamp / (Constants.MILLIS_1MIN * 10) * (Constants.MILLIS_1MIN * 10);
 		return String.join("/",
 				taskInfoVO.getTarget().getPath(),
 				outDayFormat.format(timestamp),
