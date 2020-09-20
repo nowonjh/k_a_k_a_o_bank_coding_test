@@ -1,5 +1,5 @@
 SELECT
-    CONCAT('Top', ranking, ' 메뉴')                                AS '구분',
+    CONCAT('Top', ranking, ' 메뉴')                                       AS '구분',
     MAX(IF(main.wd = 0, CONCAT(main.menu_nm, ' (', main.cnt, ')'), '-')) AS '월',
     MAX(IF(main.wd = 1, CONCAT(main.menu_nm, ' (', main.cnt, ')'), '-')) AS '화',
     MAX(IF(main.wd = 2, CONCAT(main.menu_nm, ' (', main.cnt, ')'), '-')) AS '수',
