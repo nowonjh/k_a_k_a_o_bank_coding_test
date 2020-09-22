@@ -282,7 +282,7 @@ while (rs.next()) {
 따라서 위 로직을 생산/소비 패턴으로 변경하였고 상세 테스트 코드/내용은 다음과 같습니다.
 #### 테스트 코드
 * [AsyncConvert2ParquetTest.java](https://github.com/nowonjh/kakao_bank_coding_test/blob/feature/ASYNC_FEAT/answer4/src/test/java/com/kakao/codingtest/target/AsyncConvert2ParquetTest.java).asyncMakeParquet - `테스트코드`
-* [Convert2Parquet.java] (https://github.com/nowonjh/kakao_bank_coding_test/blob/feature/ASYNC_FEAT/answer4/src/main/java/com/kakao/codingtest/target/Convert2Parquet.java).asyncConvertAndPushHDFS - `비즈니스로직`
+* [Convert2Parquet.java](https://github.com/nowonjh/kakao_bank_coding_test/blob/feature/ASYNC_FEAT/answer4/src/main/java/com/kakao/codingtest/target/Convert2Parquet.java).asyncConvertAndPushHDFS - `비즈니스로직`
 #### 테스트 내용
 * 적당한 사이즈의 BlockingQueue를 생성
 ```java 
