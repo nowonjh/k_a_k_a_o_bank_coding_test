@@ -9,19 +9,18 @@ import com.kakao.codingtest.worker.thread.JDBCWorkerThread;
 import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 public class JDBCWorker extends AWorker {
-    private JdbcManager jdbcManager;
 
-    public JDBCWorker(TaskInfoVO task, long now, JdbcManager jdbcManager) {
+    public JDBCWorker(TaskInfoVO task, long now) {
         super(task, now);
-        this.jdbcManager = jdbcManager;
     }
 
     @Override
     public void run() {
+        JdbcManager jdbcManager = new JdbcManager();
         ExecutorService threadPool = Executors.newFixedThreadPool(super.getTask().getConcurrency());
         for (RequestJDBCQueryVO queryVO: super.getQueries()) {
             Thread jdbcWorkerThread = new JDBCWorkerThread(
-                    super.getTask(), queryVO, this.jdbcManager);
+                    super.getTask(), queryVO, jdbcManager);
             threadPool.execute(jdbcWorkerThread);
         }
         threadPool.shutdown();

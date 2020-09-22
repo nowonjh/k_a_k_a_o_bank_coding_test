@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.kakao.codingtest.taskinfo.vo.SourceVO;
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 import com.kakao.codingtest.util.Constants;
-import com.kakao.codingtest.worker.JDBCWorker;
+import com.kakao.codingtest.worker.WorkerFactory;
 import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ class WorkerServiceTest {
     void getHour() throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         long time = format.parse("2020-09-19 03:20:11").getTime();
-        long hour = new JDBCWorker(null, time, null).getHour(time);
+        long hour = WorkerFactory.create("jdbc", null, time).getHour(time);
         assertEquals(3L, hour);
     }
 
@@ -78,7 +78,7 @@ class WorkerServiceTest {
         long time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2020-09-19 03:20:00").getTime();
 
         List<RequestJDBCQueryVO> queries =
-                new JDBCWorker(taskInfoVO, time, null).listQueryVO();
+                WorkerFactory.create("jdbc", taskInfoVO, time).listQueryVO();
         log.debug(queries.toString());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(taskInfoVO.getSource().getTimeFormat());

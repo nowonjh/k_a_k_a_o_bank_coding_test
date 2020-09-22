@@ -1,14 +1,11 @@
 package com.kakao.codingtest.worker.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kakao.codingtest.jdbc.JdbcManager;
 import com.kakao.codingtest.taskinfo.vo.TaskInfoVO;
 import com.kakao.codingtest.util.Constants;
 import com.kakao.codingtest.worker.AWorker;
-import com.kakao.codingtest.worker.JDBCWorker;
-import com.kakao.codingtest.worker.SqoopWorker;
+import com.kakao.codingtest.worker.WorkerFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,18 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class WorkerService {
 
-    @Autowired
-    private JdbcManager jdbcManager;
-
     public void run(long now, TaskInfoVO task) {
-        AWorker worker = null;
-        if (task.getConnector().equals(Constants.ConnectorType.SQOOP.getValue())) {
-            worker = new SqoopWorker(task, now);
-        } else if (task.getConnector().equals(Constants.ConnectorType.JDBC.getValue())) {
-            worker = new JDBCWorker(task, now, jdbcManager);
-        } else if (task.getConnector().equals(Constants.ConnectorType.SPARK.getValue())) {
-            worker = new SparkWorker(task, now);
-        }
+        AWorker worker = WorkerFactory.create(task.getConnector(), task, now);
         if (worker != null) {
             worker.start();
         } else {

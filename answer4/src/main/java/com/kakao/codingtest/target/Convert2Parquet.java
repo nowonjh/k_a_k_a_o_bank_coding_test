@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -51,6 +53,7 @@ public class Convert2Parquet implements IConvertData {
      */
     @Override
     public List<Path> convertAndPushHDFS(FileSystem fileSystem, List<Map<String, Object>> dataList) throws IOException {
+        List<Path> destPaths = new ArrayList<>();
         if (StringUtils.isBlank(this.taskInfoVO.getTarget().getPath())) {
             throw new IllegalArgumentException("parquetPath cannot be null or empty");
         }
@@ -138,8 +141,17 @@ public class Convert2Parquet implements IConvertData {
                 }
             }
             writer.write(record.build());
+
+            if (writer.getDataSize() > 1024 * 1024 * 128) {
+                writer.close();
+                String destFile = tmpPath + "_"
+                                + RandomStringUtils.random(5, true, false) + Constants.SUFFIX_PARQUET;
+                fileSystem.rename(new Path(tmpPath), new Path(destFile));
+                destPaths.add(new Path(destFile));
+                writerMap.remove(tmpPath);
+            }
         }
-        List<Path> destPaths = new ArrayList<>();
+
         for (Entry<String, ParquetWriter<Record>> entry: writerMap.entrySet()) {
             if (entry.getValue() != null) {
                 entry.getValue().close();
@@ -187,5 +199,131 @@ public class Convert2Parquet implements IConvertData {
     public List<Path> convertWriteLocal(List<Map<String, Object>> dataList) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void asyncConvertAndPushHDFS(FileSystem fileSystem, BlockingQueue<Map<String, Object>> queue) throws IOException {
+        new Thread(() -> {
+            try {
+                int i = 0;
+                List<Path> destPaths = new ArrayList<>();
+                if (StringUtils.isBlank(this.taskInfoVO.getTarget().getPath())) {
+                    throw new IllegalArgumentException("parquetPath cannot be null or empty");
+                }
+
+                SimpleDateFormat inFormat = new SimpleDateFormat(taskInfoVO.getSource().getTimeFormat());
+                String timeField = taskInfoVO.getSource().getTimeField();
+
+                Map<String, ParquetWriter<GenericData.Record>> writerMap = new HashMap<>();
+                Schema schema = null;
+
+                while (true) {
+                    i++;
+                    Map<String, Object> row;
+                    try {
+                        row = queue.poll(10, TimeUnit.SECONDS);
+                        if (i % 1000 == 0) {
+                            log.debug("consume count:" + i);
+                        }
+                    } catch (InterruptedException e) {
+                        log.debug("no more data");
+                        break;
+                    }
+                    if (schema == null) {
+                        FieldAssembler<Schema> fa = SchemaBuilder
+                                .record("record_name")
+                                .namespace("com.kakao.codingtest")
+                                .fields();
+                        for (Entry<String, Object> entry: row.entrySet()) {
+                            fa.name(entry.getKey()).type().stringType().stringDefault("-");
+                        }
+                        schema = fa.endRecord();
+                    }
+                    String tmpPath;
+                    try {
+                        tmpPath = this.generatePathStr(
+                                inFormat.parse(row.get(timeField).toString()).getTime());
+                    } catch (ParseException e1) {
+                        log.warn(e1.getMessage());
+                        tmpPath = "/tmp/unknown_time";
+                    }
+
+                    if (writerMap.get(tmpPath) == null) {
+                        ParquetWriter<GenericData.Record> writer = this.createParquetWriter(tmpPath, schema);
+                        writerMap.put(tmpPath, writer);
+                    }
+                    ParquetWriter<GenericData.Record> writer = writerMap.get(tmpPath);
+                    GenericRecordBuilder record = new GenericRecordBuilder(schema);
+                    for (Schema.Field f : schema.getFields()) {
+                        switch (f.schema().getType()) {
+                            case BOOLEAN:
+                                try {
+                                    record.set(f, Boolean.parseBoolean(row.get(f.name()).toString()));
+                                } catch (Exception e) {
+                                    record.set(f, false);
+                                }
+                                break;
+                            case INT:
+                                try {
+                                    record.set(f, Integer.parseInt(row.get(f.name()).toString()));
+                                } catch (NumberFormatException | NullPointerException e) {
+                                    record.set(f, 0);
+                                }
+                                break;
+                            case FLOAT:
+                                try {
+                                    record.set(f, Float.parseFloat(row.get(f.name()).toString()));
+                                } catch (NumberFormatException | NullPointerException e) {
+                                    record.set(f, 0.0f);
+                                }
+                                break;
+                            case DOUBLE:
+                                try {
+                                    record.set(f, Double.parseDouble(row.get(f.name()).toString()));
+                                } catch (NumberFormatException | NullPointerException e) {
+                                    record.set(f, 0.0d);
+                                }
+                                break;
+                            case LONG:
+                                try {
+                                    record.set(f, Long.parseLong(row.get(f.name()).toString()));
+                                } catch (NumberFormatException | NullPointerException e) {
+                                    record.set(f, 0L);
+                                }
+                                break;
+                            default:
+                                if (row.get(f.name()) != null) {
+                                    record.set(f, row.get(f.name()));
+                                } else {
+                                    record.set(f, "");
+                                }
+                                break;
+                        }
+                    }
+                    writer.write(record.build());
+
+                    if (writer.getDataSize() > 1024 * 1024 * 128) {
+                        writer.close();
+                        String destFile = tmpPath + "_"
+                                        + RandomStringUtils.random(5, true, false) + Constants.SUFFIX_PARQUET;
+                        fileSystem.rename(new Path(tmpPath), new Path(destFile));
+                        destPaths.add(new Path(destFile));
+                        writerMap.remove(tmpPath);
+                    }
+                }
+
+                for (Entry<String, ParquetWriter<Record>> entry: writerMap.entrySet()) {
+                    if (entry.getValue() != null) {
+                        entry.getValue().close();
+                    }
+                    String destFile =
+                            entry.getKey() + "_"
+                                    + RandomStringUtils.random(5, true, false) + Constants.SUFFIX_PARQUET;
+                    fileSystem.rename(new Path(entry.getKey()), new Path(destFile));
+                    destPaths.add(new Path(destFile));
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }).start();
     }
 }
