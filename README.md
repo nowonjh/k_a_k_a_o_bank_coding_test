@@ -238,7 +238,7 @@
     * `delay_min` - ntp동기화 미적용 등에 의해 정확한 시간에 실행할경우 데이터 유실이 발생할수 있기 때문에 delay를 주는 옵션, 또한 부하가 큰 작업인만큼 부하가 상대적으로 낮은 새벽에 진행하도록 하기 위함. 
     * (`현재시간(timestamp)` + `timezone gap (9시간)` - `delay_min`) %
     `period_hour` <= `5분` 을 만족하면 실행.
-* 쿼리의 부하를 고려하여 `period_hour` 범위의 쿼리를 여러개로 분할 -  [AWorker.java](https://github.com/nowonjh/k_a_k_a_o_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/taskinfo/TaskInfoManager.java)
+* 쿼리의 부하를 고려하여 `period_hour` 범위의 쿼리를 여러개로 분할 -  [AWorker.java](https://github.com/nowonjh/kakao_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/worker/AWorker.java)
     * 데이터의 유입이 많아 지는 시간대를 지정 `begin_load_hour`, `end_load_hour`
     * 각각 6, 24 로 지정할경우
        * 06시 부터 00시까지는 각 쿼리를 20분으로 나누어 쿼리
@@ -258,4 +258,50 @@
 * 현재 Parquet로 저장시 모두 String 문자열로 저장하고 있는데
   mysql 쿼리시 metadata를 통해 데이터의 타입을 확인하여 데이터 타입에 대한 schema 적용 필요.
 * (Optional) Export해야 하는 데이터의 양을 먼저 측정하여 적정량의 데이터로 나누어 쿼리하는 기능
+
+---
+
+### 과제 제출 기한(9/21) 만료 후 진행
+과제 제출기한 만료 이후에 진행한 사항 이기 때문에 평가에 반영되지 않도록 새로운 브랜치에 작업을 진행하였습니다.
+#### `branch`:[feature/ASYNC_FEAT](https://github.com/nowonjh/kakao_bank_coding_test/tree/feature/ASYNC_FEAT/)
+마음에 들지 않았던 JDBC ResultSet에서 데이터를 List<Map> 객체로 변환하는 코드입니다.
+[JdbcManager.java](https://github.com/nowonjh/kakao_bank_coding_test/blob/master/answer4/src/main/java/com/kakao/codingtest/jdbc/JdbcManager.java)
+```java
+List<Map<String, Object>> result = new ArrayList<>();
+while (rs.next()) {
+    Map<String, Object> row = new HashMap<>();
+    for (String col: columns) {
+	row.put(col, rs.getObject(col));
+    }
+    result.add(row);
+```
+부하를 분산시키기 위해 쿼리를 분할하였지만 위 로직에서는 List객체에 얼마만큼의 데이터가 담길지 가늠하기 힘듭니다.
+게다가 concurrency값을 높게 설정할경우 이 어플리케이션은 메모리를 효율적으로 사용하지 못하고 잦은 GC로 인해
+스트레스를 받을것이며 제대로된 성능을 내지 못하게 될 확률이 높습니다.
+
+따라서 위 로직을 생산/소비 패턴으로 변경하였고 상세 테스트 코드/내용은 다음과 같습니다.
+#### 테스트 코드
+* [AsyncConvert2ParquetTest.java](https://github.com/nowonjh/kakao_bank_coding_test/blob/feature/ASYNC_FEAT/answer4/src/test/java/com/kakao/codingtest/target/AsyncConvert2ParquetTest.java).asyncMakeParquet - `테스트코드`
+* [Convert2Parquet.java] (https://github.com/nowonjh/kakao_bank_coding_test/blob/feature/ASYNC_FEAT/answer4/src/main/java/com/kakao/codingtest/target/Convert2Parquet.java).asyncConvertAndPushHDFS - `비즈니스로직`
+#### 테스트 내용
+* 적당한 사이즈의 BlockingQueue를 생성
+```java 
+BlockingQueue<Map<String, Object>> queue = new LinkedBlockingQueue<>(10_000);
+```
+* 데이터 생성이 시작 되기전에 소비자 스레드를 생성
+* 생산자는 `put` 을 통해 큐에 데이터를 넣어 큐 풀이 될경우 waiting
+```java
+ queue.put(row);
+ ```
+* 소비자는 데이터의 끝을 알수 없기때문에 적당한 시간의 타임아웃을 주고 `poll`
+```java
+queue.poll(60, TimeUnit.SECONDS);
+```
+* `poll` 함수를 통해 얻은 데이터를 기존 List를 loop 돌때와 동일하게 수행
+
+
+
+
+
+
 
