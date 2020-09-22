@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
 import com.kakao.codingtest.taskinfo.vo.SourceVO;
 import com.kakao.codingtest.worker.vo.RequestJDBCQueryVO;
 
@@ -22,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-@Service
 public class JdbcManager {
     private Connection getConnection(SourceVO source) throws ClassNotFoundException, SQLException {
         Connection con = null;
@@ -37,30 +34,16 @@ public class JdbcManager {
         }
     }
 
-    private void close(Connection con) {
-        if (con != null) {
+    private void close(Object obj) {
+        if (obj != null) {
             try {
-                con.close();
-            } catch (SQLException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-    }
-
-    private void close(ResultSet rs) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-    }
-
-    private void close(PreparedStatement ps) {
-        if (ps != null) {
-            try {
-                ps.close();
+                if (obj instanceof Connection) {
+                    ((Connection) obj).close();
+                } else if (obj instanceof ResultSet) {
+                    ((ResultSet) obj).close();
+                } else if (obj instanceof PreparedStatement) {
+                    ((PreparedStatement) obj).close();
+                }
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
             }

@@ -5,7 +5,7 @@
         "period_hour": 24,
         "concurrency": 3,
         "delete_after_stored": true,
-        "connector": "jdbc",            // jdbc, sqoop, spark
+        "connector": "jdbc",
         "source": {
             "type": "mysql",
             "url": "jdbc:mysql://localhost:3306/kakaobank?characterEncoding=UTF-8&serverTimezone=UTC",
@@ -20,9 +20,9 @@
             "additional_query": "menu_nm <> 'logout'"
         },
         "target": {
-            "type": "hdfs",            // hdfs, aws_s3, samba, local
+            "type": "hdfs",
             "url": "hdfs://localhost:11000",
-            "format": "parquet",      // parquet, csv
+            "format": "parquet",
             "path": "/data/menu_log"
         }
     }

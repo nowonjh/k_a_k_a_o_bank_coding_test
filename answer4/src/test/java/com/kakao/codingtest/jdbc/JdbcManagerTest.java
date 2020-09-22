@@ -17,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootTest
 class JdbcManagerTest {
-    @Autowired
-    private JdbcManager databaseManager;
 
     @Autowired
     private TaskInfoManager taskInfoManager;
@@ -34,7 +32,7 @@ class JdbcManagerTest {
                     .endTime("20190329000000")
                     .build();
         try {
-            assertEquals(635, databaseManager.query(sourceVO, requestJDBCQueryVO).size());
+            assertEquals(635, new JdbcManager().query(sourceVO, requestJDBCQueryVO).size());
         } catch (ClassNotFoundException e) {
             log.error(e.getMessage(), e);
             e.printStackTrace();
